@@ -1,67 +1,103 @@
-import { FC, useState } from 'react'
-import { Image, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { FC, Ref, useRef, useState } from 'react'
+import {
+  FlatList,
+  GestureResponderEvent,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { FontAwesome } from '@expo/vector-icons'
+import { Formik } from 'formik'
 
 import Input from '../../components/common/Input'
 import { Colors } from '../../config/theme'
 
 import logo from '../../../assets/logo.png'
 import Button from '../../components/common/Button'
+import { registerValidationSchema } from '../../utils/registerValidate'
+
+interface ListProps {
+  id: number
+  title: string
+  placeHolder: string
+  icon: React.ComponentProps<typeof FontAwesome>['name']
+  value: string
+  name: string
+}
 
 const Register: FC = () => {
-  const [fields, setFields] = useState<
+  const [fields, setFields] = useState<ListProps[]>([
     {
-      name: string
-      placeHolder: string
-      icon: React.ComponentProps<typeof FontAwesome>['name']
-      value: string
-      valid: boolean
-    }[]
-  >([
-    {
-      name: 'Full Name',
+      id: 0,
+      title: 'Full Name',
       placeHolder: 'Enter full name',
       icon: 'user-o',
       value: '',
-      valid: true
+      name: 'fullname'
     },
     {
-      name: 'Email Address',
+      id: 1,
+      title: 'Email Address',
       placeHolder: 'Enter email address',
       icon: 'envelope-o',
       value: '',
-      valid: true
+      name: 'email'
     },
     {
-      name: 'Contact Number',
+      id: 2,
+      title: 'Contact Number',
       placeHolder: 'Enter mobile number',
       icon: 'phone',
       value: '',
-      valid: true
+      name: 'number'
     },
     {
-      name: 'Full Address',
+      id: 3,
+      title: 'Full Address',
       placeHolder: 'Enter home address',
       icon: 'map-marker',
       value: '',
-      valid: true
+      name: 'address'
     },
     {
-      name: 'Passoword',
+      id: 4,
+      title: 'Passoword',
       placeHolder: 'Enter strong passoword',
       icon: 'lock',
       value: '',
-      valid: true
+      name: 'password'
     },
     {
-      name: 'Confirm Passoword',
+      id: 5,
+      title: 'Confirm Passoword',
       placeHolder: 'Enter confirm passoword',
       icon: 'lock',
       value: '',
-      valid: true
+      name: 'confirmPassword'
     }
   ])
+
+  // const handleChange = (index: number, value: string) => {
+  //   const tempFields = [...fields]
+  //   tempFields[index].value = value
+  //   setFields(tempFields)
+  // }
+
+  const registerUser = async () => {
+    // const valid = await registerValidate({
+    //   fullname: fields[0].value,
+    //   email: fields[1].value,
+    //   number: parseInt(fields[2].value),
+    //   address: fields[3].value,
+    //   password: fields[4].value,
+    //   confirmPassword: fields[5].value
+    // })
+    // console.log('valid: ', valid)
+  }
 
   return (
     <View style={styles.container}>
@@ -72,14 +108,38 @@ const Register: FC = () => {
       </View>
       <View style={styles.bottomContainer}>
         <View style={styles.formWrapper}>
-          <Text style={styles.registerHeading}>Register your account</Text>
-          {fields.map((item, index) => (
-            <Input key={index.toString()} {...item} />
-          ))}
-
-          <View style={styles.buttonWrapper}>
-            <Button name='Register' width='75%' />
-          </View>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text style={styles.registerHeading}>Register your account</Text>
+            <Formik
+              validationSchema={registerValidationSchema}
+              initialValues={{
+                fullname: '',
+                email: '',
+                number: '',
+                address: '',
+                password: '',
+                confirmPassword: ''
+              }}
+              onSubmit={values => console.log(values)}
+            >
+              {({ handleChange, handleBlur, handleSubmit, values, errors, isValid }) => (
+                <>
+                  {console.log(errors)}
+                  {fields.map(item => (
+                    <Input
+                      key={item.id.toString()}
+                      {...item}
+                      errors={errors}
+                      handleChange={handleChange}
+                    />
+                  ))}
+                  <View style={styles.buttonWrapper}>
+                    <Button handleSubmit={handleSubmit} name='Register' width='75%' />
+                  </View>
+                </>
+              )}
+            </Formik>
+          </ScrollView>
         </View>
       </View>
     </View>
@@ -135,7 +195,8 @@ const styles = StyleSheet.create({
 
   buttonWrapper: {
     alignItems: 'center',
-    marginTop: RFPercentage(4)
+    marginTop: RFPercentage(4),
+    marginBottom: RFPercentage(2)
   }
 })
 

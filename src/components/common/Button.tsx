@@ -1,16 +1,21 @@
 import { FC } from 'react'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { GestureResponderEvent, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Colors } from '../../config/theme'
 
 interface Props {
   name: string
   width: string
+  handleSubmit: () => void
 }
 
-const Button: FC<Props> = (props: Props) => (
-  <TouchableOpacity activeOpacity={0.7} style={[styles.buttonContainer, { width: props.width }]}>
-    <Text style={styles.buttonName}>{props.name}</Text>
+const Button: FC<Props> = ({ name, width, handleSubmit }: Props) => (
+  <TouchableOpacity
+    activeOpacity={0.7}
+    onPress={handleSubmit}
+    style={[styles.buttonContainer, { width: width }]}
+  >
+    <Text style={styles.buttonName}>{name}</Text>
   </TouchableOpacity>
 )
 

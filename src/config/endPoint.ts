@@ -1,0 +1,1 @@
+export const nodeApi = "http://localhost:5000/api"
