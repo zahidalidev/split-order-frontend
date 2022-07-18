@@ -1,10 +1,9 @@
 import { FC } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+
+import RegisterScreen from './src/pages/auth/RegisterScreen'
 
 const App: FC = () => {
-  return (
-    <View></View>
-  )
+  return <RegisterScreen />
 }
 
 export default App
