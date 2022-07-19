@@ -1,1 +1,1 @@
-export const nodeApi = "http://localhost:5000/api"
+export const nodeApi = "https://b7b8-202-142-162-6.ap.ngrok.io/api"

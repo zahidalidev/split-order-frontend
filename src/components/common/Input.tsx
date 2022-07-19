@@ -5,56 +5,48 @@ import { FontAwesome } from '@expo/vector-icons'
 
 import { Colors } from '../../config/theme'
 
-type errorsOptions = {
-  [key: string]: boolean
+interface errorsOptions {
+  [key: string]: {}
 }
+
 interface Props {
-  id: number
   title: string
   placeHolder: string
   icon: React.ComponentProps<typeof FontAwesome>['name']
-  value: string
   name: string
   handleChange: Function
   errors: errorsOptions
 }
 
-const Input: FC<Props> = ({
-  id,
-  title,
-  placeHolder,
-  icon,
-  value,
-  name,
-  handleChange,
-  errors
-}: Props) => (
-  <View style={styles.inputContainer}>
-    <View style={styles.inputMainContainer}>
-      <Text style={styles.inputHeading}>{title}</Text>
-      <View style={styles.inputWrapper}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1, width: '100%' }}
-        >
-          <TextInput
-            name={name}
-            onChangeText={handleChange(name)}
-            style={styles.input}
-            placeholder={placeHolder}
+const Input: FC<Props> = ({ title, placeHolder, icon, name, handleChange, errors }: Props) => {
+  return (
+    <View style={styles.inputContainer}>
+      <View style={styles.inputMainContainer}>
+        <Text style={styles.inputHeading}>{title}</Text>
+        <View style={styles.inputWrapper}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1, width: '100%' }}
+          >
+            <TextInput
+              onChangeText={handleChange(name)}
+              name={name}
+              style={styles.input}
+              placeholder={placeHolder}
+            />
+          </KeyboardAvoidingView>
+          <FontAwesome
+            style={styles.inputIcon}
+            name={icon}
+            color={Colors.grey}
+            size={RFPercentage(2.3)}
           />
-        </KeyboardAvoidingView>
-        <FontAwesome
-          style={styles.inputIcon}
-          name={icon}
-          color={Colors.grey}
-          size={RFPercentage(2.3)}
-        />
+        </View>
       </View>
+      {errors[name] && <Text style={styles.error}>{errors[name]}</Text>}
     </View>
-    {errors[name] && <Text style={styles.error}>{errors[name]}</Text>}
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
   inputContainer: {

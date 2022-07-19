@@ -1,50 +1,37 @@
-import { FC, Ref, useRef, useState } from 'react'
-import {
-  FlatList,
-  GestureResponderEvent,
-  Image,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
+import { FC, useState } from 'react'
+import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
-import { FontAwesome } from '@expo/vector-icons'
 import { Formik } from 'formik'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 import Input from '../../components/common/Input'
 import Button from '../../components/common/Button'
-import { registerValidationSchema } from '../../utils/authValidate'
-import { addUser } from '../../services/user'
+import { loginValidationSchema } from '../../utils/authValidate'
 import LoadingModal from '../../components/common/LoadingModal'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { loginUser } from '../../services/user'
+import { loginFields, Token } from '../../utils/constants'
 
 import { Colors } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 import { RootStackParams } from '../../../App'
-import { registerFields } from '../../utils/constants'
 
-type Props = NativeStackScreenProps<RootStackParams, 'Login'>
-
-interface ValuesOb {
-  fullName: string
+interface valuesOb {
   email: string
-  number: string
-  address: string
   password: string
-  confirmPassword: string
 }
 
-const Register: FC<Props> = ({ navigation }: Props) => {
+type Props = NativeStackScreenProps<RootStackParams, 'Restaurent'>
+
+const Login: FC<Props> = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false)
 
-  const registerUser = async (values: ValuesOb) => {
+  const loginHandle = async (values: valuesOb) => {
     try {
       setLoading(true)
-      const { data } = await addUser(values)
-      console.log(data)
-      navigation.navigate('Login', { name: '' })
+      const { data } = await loginUser(values)
+      AsyncStorage.setItem(Token, JSON.stringify(data))
+      navigation.navigate('Restaurent', { name: '' })
     } catch (error) {
       console.log(error)
     }
@@ -62,22 +49,19 @@ const Register: FC<Props> = ({ navigation }: Props) => {
       <View style={styles.bottomContainer}>
         <View style={styles.formWrapper}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={styles.registerHeading}>Register your account</Text>
+            <Text style={styles.loginHeading}>Login to your account</Text>
             <Formik
-              validationSchema={registerValidationSchema}
+              validationSchema={loginValidationSchema}
               initialValues={{
-                fullName: '',
                 email: '',
-                number: '',
-                address: '',
                 password: '',
                 confirmPassword: ''
               }}
-              onSubmit={values => registerUser(values)}
+              onSubmit={values => loginHandle(values)}
             >
               {({ handleChange, handleSubmit, errors }) => (
                 <>
-                  {registerFields.map(item => (
+                  {loginFields.map(item => (
                     <Input
                       key={item.id.toString()}
                       {...item}
@@ -86,7 +70,7 @@ const Register: FC<Props> = ({ navigation }: Props) => {
                     />
                   ))}
                   <View style={styles.buttonWrapper}>
-                    <Button handleSubmit={handleSubmit} name='Register' width='75%' />
+                    <Button handleSubmit={handleSubmit} name='Login' width='75%' />
                   </View>
                 </>
               )}
@@ -105,26 +89,25 @@ const styles = StyleSheet.create({
   },
 
   topContainer: {
-    flex: 0.22,
+    flex: 0.35,
     backgroundColor: Colors.secondary,
     justifyContent: 'center',
     alignItems: 'center'
   },
 
   logo: {
-    width: RFPercentage(7)
+    width: RFPercentage(12)
   },
 
   topContainerHeading: {
-    fontSize: RFPercentage(2.7),
+    fontSize: RFPercentage(3.5),
     fontWeight: '400',
     color: Colors.white,
-    marginBottom: RFPercentage(5),
-    marginTop: -RFPercentage(2)
+    marginBottom: RFPercentage(5)
   },
 
   bottomContainer: {
-    flex: 0.78,
+    flex: 0.65,
     backgroundColor: Colors.white,
     borderTopLeftRadius: RFPercentage(2.5),
     borderTopRightRadius: RFPercentage(2.5),
@@ -134,12 +117,12 @@ const styles = StyleSheet.create({
 
   formWrapper: {
     width: '90%',
-    marginTop: RFPercentage(2)
+    marginTop: RFPercentage(3)
   },
 
-  registerHeading: {
+  loginHeading: {
     fontSize: RFPercentage(3.3),
-    margin: RFPercentage(1),
+    margin: RFPercentage(3),
     fontWeight: '600',
     alignSelf: 'center',
     color: Colors.secondary
@@ -147,9 +130,9 @@ const styles = StyleSheet.create({
 
   buttonWrapper: {
     alignItems: 'center',
-    marginTop: RFPercentage(4),
+    marginTop: RFPercentage(5),
     marginBottom: RFPercentage(2)
   }
 })
 
-export default Register
+export default Login

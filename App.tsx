@@ -1,17 +1,33 @@
 import { FC } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import RegisterScreen from './src/pages/auth/RegisterScreen'
+import LoginScreen from './src/pages/auth/LoginScreen'
+import RestaurentScreen from './src/pages/RestaurentScreen'
 
-const Stack = createStackNavigator()
+export type RootStackParams = {
+  Register: {
+    name: string
+  }
+  Login: {
+    name: string
+  }
+  Restaurent: {
+    name: string
+  }
+}
+
+const RootStack = createNativeStackNavigator<RootStackParams>()
 
 const App: FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='register'>
-        <Stack.Screen name='register' component={RegisterScreen} />
-      </Stack.Navigator>
+      <RootStack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
+        <RootStack.Screen name='Register' component={RegisterScreen} />
+        <RootStack.Screen name='Login' component={LoginScreen} />
+        <RootStack.Screen name='Restaurent' component={RestaurentScreen} />
+      </RootStack.Navigator>
     </NavigationContainer>
   )
 }
