@@ -72,3 +72,15 @@ export const registerFields: ListProps[] = [
 
 export const Token = 'token'
 export const User = 'user'
+export const homeBars = [
+  {
+    id: 0,
+    name: 'item',
+    title: 'Add Items'
+  },
+  {
+    id: 1,
+    name: 'rest',
+    title: 'Add Restaurant'
+  }
+]

@@ -21,7 +21,7 @@ interface valuesOb {
   password: string
 }
 
-type Props = NativeStackScreenProps<RootStackParams, 'Restaurent'>
+type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const Login: FC<Props> = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false)
@@ -32,7 +32,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       setLoading(true)
       const { data } = await loginUser(values)
       AsyncStorage.setItem(Token, JSON.stringify(data))
-      navigation.navigate('Restaurent', { name: '' })
+      navigation.navigate('Home', { name: '' })
     } catch (error) {
       console.log(error)
     }
@@ -44,7 +44,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       const token = await AsyncStorage.getItem(Token)
       const { data } = await getCurrentUser(token as string)
       await AsyncStorage.setItem(User, JSON.stringify(data))
-      navigation.navigate('Restaurent', { name: '' })
+      navigation.navigate('Home', { name: '' })
     } catch (error: any) {
       setLogin(true)
       console.log('Login error: ', error.message)

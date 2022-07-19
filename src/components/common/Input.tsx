@@ -12,10 +12,10 @@ interface errorsOptions {
 interface Props {
   title: string
   placeHolder: string
-  icon: React.ComponentProps<typeof FontAwesome>['name']
+  icon?: React.ComponentProps<typeof FontAwesome>['name']
   name: string
   handleChange: Function
-  errors: errorsOptions
+  errors?: errorsOptions
 }
 
 const Input: FC<Props> = ({ title, placeHolder, icon, name, handleChange, errors }: Props) => {
@@ -31,19 +31,21 @@ const Input: FC<Props> = ({ title, placeHolder, icon, name, handleChange, errors
             <TextInput
               onChangeText={handleChange(name)}
               name={name}
-              style={styles.input}
+              style={[styles.input, { marginTop: icon || 7, marginBottom: icon || 7 }]}
               placeholder={placeHolder}
             />
           </KeyboardAvoidingView>
-          <FontAwesome
-            style={styles.inputIcon}
-            name={icon}
-            color={Colors.grey}
-            size={RFPercentage(2.3)}
-          />
+          {icon && (
+            <FontAwesome
+              style={styles.inputIcon}
+              name={icon}
+              color={Colors.grey}
+              size={RFPercentage(2.3)}
+            />
+          )}
         </View>
       </View>
-      {errors[name] && <Text style={styles.error}>{errors[name]}</Text>}
+      {errors && errors[name] && <Text style={styles.error}>{errors[name]}</Text>}
     </View>
   )
 }

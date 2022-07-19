@@ -5,15 +5,15 @@ import { Colors } from '../../config/theme'
 
 interface Props {
   name: string
-  width: string
-  handleSubmit: () => void
+  width?: string
+  handleSubmit?: () => void
 }
 
 const Button: FC<Props> = ({ name, width, handleSubmit }: Props) => (
   <TouchableOpacity
     activeOpacity={0.7}
     onPress={handleSubmit}
-    style={[styles.buttonContainer, { width: width }]}
+    style={[styles.buttonContainer, { width }]}
   >
     <Text style={styles.buttonName}>{name}</Text>
   </TouchableOpacity>
