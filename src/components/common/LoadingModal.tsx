@@ -8,9 +8,10 @@ const windowHeight = Dimensions.get('window').height
 
 interface Props {
   show: boolean
+  transparent?: boolean
 }
 
-const LoadingModal: FC<Props> = ({ show }: Props) => {
+const LoadingModal: FC<Props> = ({ show, transparent = false }: Props) => {
   return (
     <Modal
       visible={show}
@@ -29,11 +30,11 @@ const LoadingModal: FC<Props> = ({ show }: Props) => {
       >
         <View
           style={{
-            elevation: 5,
+            elevation: transparent ? 0 : 5,
             width: RFPercentage(10),
             height: RFPercentage(10),
             borderRadius: 10,
-            backgroundColor: Colors.white,
+            backgroundColor: transparent ? '#ffffff00' : Colors.white,
             justifyContent: 'center',
             alignItems: 'center'
           }}

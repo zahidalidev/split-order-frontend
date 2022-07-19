@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Formik } from 'formik'
@@ -9,7 +9,7 @@ import Input from '../../components/common/Input'
 import Button from '../../components/common/Button'
 import { loginValidationSchema } from '../../utils/authValidate'
 import LoadingModal from '../../components/common/LoadingModal'
-import { loginUser } from '../../services/user'
+import { getCurrentUser, loginUser } from '../../services/user'
 import { loginFields, Token } from '../../utils/constants'
 
 import { Colors } from '../../config/theme'
@@ -25,6 +25,7 @@ type Props = NativeStackScreenProps<RootStackParams, 'Restaurent'>
 
 const Login: FC<Props> = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false)
+  const [login, setLogin] = useState(false)
 
   const loginHandle = async (values: valuesOb) => {
     try {
@@ -38,7 +39,25 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     setLoading(false)
   }
 
-  return (
+  const getUser = async () => {
+    try {
+      const token = await AsyncStorage.getItem(Token)
+      const { data } = await getCurrentUser(token as string)
+      navigation.navigate('Restaurent', { name: '' })
+    } catch (error: any) {
+      setLogin(true)
+      console.log('Login error: ', error.message)
+      navigation.navigate('Login', { name: '' })
+    }
+  }
+
+  useEffect(() => {
+    getUser()
+  }, [])
+
+  return !login ? (
+    <LoadingModal show={true} transparent={true} />
+  ) : (
     <View style={styles.container}>
       <LoadingModal show={loading} />
       <StatusBar barStyle='light-content' backgroundColor={Colors.secondary} />

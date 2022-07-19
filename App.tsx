@@ -20,16 +20,14 @@ export type RootStackParams = {
 
 const RootStack = createNativeStackNavigator<RootStackParams>()
 
-const App: FC = () => {
-  return (
-    <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
-        <RootStack.Screen name='Register' component={RegisterScreen} />
-        <RootStack.Screen name='Login' component={LoginScreen} />
-        <RootStack.Screen name='Restaurent' component={RestaurentScreen} />
-      </RootStack.Navigator>
-    </NavigationContainer>
-  )
-}
+const App: FC = () => (
+  <NavigationContainer>
+    <RootStack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
+      <RootStack.Screen name='Register' component={RegisterScreen} />
+      <RootStack.Screen name='Login' component={LoginScreen} />
+      <RootStack.Screen name='Restaurent' component={RestaurentScreen} />
+    </RootStack.Navigator>
+  </NavigationContainer>
+)
 
 export default App
