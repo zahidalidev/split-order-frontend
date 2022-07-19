@@ -54,8 +54,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
               validationSchema={loginValidationSchema}
               initialValues={{
                 email: '',
-                password: '',
-                confirmPassword: ''
+                password: ''
               }}
               onSubmit={values => loginHandle(values)}
             >
