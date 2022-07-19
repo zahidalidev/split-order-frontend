@@ -10,7 +10,7 @@ import Button from '../../components/common/Button'
 import { loginValidationSchema } from '../../utils/authValidate'
 import LoadingModal from '../../components/common/LoadingModal'
 import { getCurrentUser, loginUser } from '../../services/user'
-import { loginFields, Token } from '../../utils/constants'
+import { loginFields, Token, User } from '../../utils/constants'
 
 import { Colors } from '../../config/theme'
 import logo from '../../../assets/logo.png'
@@ -43,6 +43,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     try {
       const token = await AsyncStorage.getItem(Token)
       const { data } = await getCurrentUser(token as string)
+      await AsyncStorage.setItem(User, JSON.stringify(data))
       navigation.navigate('Restaurent', { name: '' })
     } catch (error: any) {
       setLogin(true)

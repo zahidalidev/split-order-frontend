@@ -71,3 +71,4 @@ export const registerFields: ListProps[] = [
 ]
 
 export const Token = 'token'
+export const User = 'user'
