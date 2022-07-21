@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   Alert,
   ImageBackground,
@@ -10,28 +10,52 @@ import {
 } from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Picker } from '@react-native-picker/picker'
+import { useToast } from 'react-native-styled-toast'
 
-import { homeBars, Token, User } from '../utils/constants'
+import { homeBars } from '../utils/constants'
 import Button from '../components/common/Button'
 
 import headerImg from '../../assets/header.jpg'
-import { Colors } from '../config/theme'
+import { Colors, toastTheme } from '../config/theme'
 import Input from '../components/common/Input'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { addRestaurant } from '../services/restaurant'
+import { addRestaurant, getUserRestaurant } from '../services/restaurant'
 import LoadingModal from '../components/common/LoadingModal'
+import { getToken } from '../utils/getToken'
+
+interface RestItems {
+  __v: number
+  _id: string
+  name: string
+  userId: string
+}
 
 const Home: FC = () => {
   const [selectedItem, setItem] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
   const [restName, setRestName] = useState('')
   const [loading, setLoading] = useState(false)
-  const items = [{ label: 'label1', value: 1 }]
+  const { toast } = useToast()
+  const [restPickItems, setRestPickItems] = useState([{ label: 'label1', value: 1 }])
 
   const handleRestName = (name: string) => {
     if (name) {
       setRestName(name)
     }
+  }
+
+  useEffect(() => {
+    allUserRestaurents()
+  }, [])
+
+  const allUserRestaurents = async () => {
+    try {
+      const token = await getToken()
+      const { data } = await getUserRestaurant(token || '')
+      const allRest = data.map((item: RestItems) => {
+        return { label: item.name, value: item._id }
+      })
+      setRestPickItems(allRest)
+    } catch (error) {}
   }
 
   const handleRestaurant = async () => {
@@ -42,12 +66,24 @@ const Home: FC = () => {
         return
       }
 
-      const token = await AsyncStorage.getItem(Token)
+      const token = await getToken()
       await addRestaurant(restName, token || '')
+      toast({ message: 'Restaurant Added' })
     } catch (error: any) {
       console.log('error: ', error.message)
+      toast({
+        message: 'Error while adding restaurant!',
+        ...toastTheme.error
+      })
     }
     setLoading(false)
+  }
+
+  const handleCurrentBar = (name: string) => {
+    setCurrentBar(name)
+    if (name === 'item') {
+      allUserRestaurents()
+    }
   }
 
   return (
@@ -62,7 +98,7 @@ const Home: FC = () => {
             <TouchableOpacity
               key={item.id.toString()}
               activeOpacity={0.7}
-              onPress={() => setCurrentBar(item.name)}
+              onPress={() => handleCurrentBar(item.name)}
               style={[
                 styles.bar,
                 { backgroundColor: currentBar === item.name ? Colors.primary : Colors.lightGrey }
@@ -92,8 +128,9 @@ const Home: FC = () => {
             selectedValue={selectedItem}
             onValueChange={(itemValue, itemIndex) => setItem(itemValue)}
           >
-            <Picker.Item label='Java' value='java' />
-            <Picker.Item label='JavaScript' value='js' />
+            {restPickItems.map(item => (
+              <Picker.Item key={item.label} label={item.label} value={item.value} />
+            ))}
           </Picker>
         )}
       </View>

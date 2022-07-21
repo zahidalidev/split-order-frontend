@@ -11,3 +11,10 @@ export const addRestaurant = async (name: string, token: string) =>
       }
     }
   )
+
+export const getUserRestaurant = async (token: string) =>
+  await axios.get(`${nodeApi}/restaurant`, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
