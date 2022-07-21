@@ -1,19 +1,31 @@
 import { FC, useState } from 'react'
-import { ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  ImageBackground,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Picker } from '@react-native-picker/picker'
 
-import { homeBars } from '../utils/constants'
+import { homeBars, Token, User } from '../utils/constants'
 import Button from '../components/common/Button'
 
 import headerImg from '../../assets/header.jpg'
 import { Colors } from '../config/theme'
 import Input from '../components/common/Input'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { addRestaurant } from '../services/restaurant'
+import LoadingModal from '../components/common/LoadingModal'
 
 const Home: FC = () => {
   const [selectedItem, setItem] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
   const [restName, setRestName] = useState('')
+  const [loading, setLoading] = useState(false)
   const items = [{ label: 'label1', value: 1 }]
 
   const handleRestName = (name: string) => {
@@ -22,8 +34,25 @@ const Home: FC = () => {
     }
   }
 
+  const handleRestaurant = async () => {
+    setLoading(true)
+    try {
+      if (restName === '') {
+        Alert.alert('name is requred')
+        return
+      }
+
+      const token = await AsyncStorage.getItem(Token)
+      await addRestaurant(restName, token || '')
+    } catch (error: any) {
+      console.log('error: ', error.message)
+    }
+    setLoading(false)
+  }
+
   return (
     <View style={styles.mainContainer}>
+      <LoadingModal show={loading} />
       <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
         <StatusBar backgroundColor='transparent' translucent={true} />
       </ImageBackground>
@@ -49,11 +78,10 @@ const Home: FC = () => {
             <Input
               title='Restaurant Name'
               placeHolder='Enter restaurant name'
-              name='testaurant'
               handleChange={handleRestName}
             />
             <View style={styles.addResBtn}>
-              <Button name='Add Restaurant' />
+              <Button handleSubmit={handleRestaurant} name='Add Restaurant' />
             </View>
           </View>
         ) : (

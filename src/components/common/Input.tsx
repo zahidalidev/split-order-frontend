@@ -5,7 +5,7 @@ import { FontAwesome } from '@expo/vector-icons'
 
 import { Colors } from '../../config/theme'
 
-interface errorsOptions {
+interface ErrorsOptions {
   [key: string]: {}
 }
 
@@ -13,12 +13,12 @@ interface Props {
   title: string
   placeHolder: string
   icon?: React.ComponentProps<typeof FontAwesome>['name']
-  name: string
+  name?: string
   handleChange: Function
-  errors?: errorsOptions
+  errors?: ErrorsOptions
 }
 
-const Input: FC<Props> = ({ title, placeHolder, icon, name, handleChange, errors }: Props) => {
+const Input: FC<Props> = ({ title, placeHolder, icon, name = '', handleChange, errors }: Props) => {
   return (
     <View style={styles.inputContainer}>
       <View style={styles.inputMainContainer}>
@@ -29,7 +29,7 @@ const Input: FC<Props> = ({ title, placeHolder, icon, name, handleChange, errors
             style={{ flex: 1, width: '100%' }}
           >
             <TextInput
-              onChangeText={handleChange(name)}
+              onChangeText={text => handleChange(text)}
               name={name}
               style={[styles.input, { marginTop: icon || 7, marginBottom: icon || 7 }]}
               placeholder={placeHolder}
