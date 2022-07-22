@@ -16,12 +16,21 @@ interface Props {
   name?: string
   handleChange: Function
   errors?: ErrorsOptions
+  width?: string | number
 }
 
-const Input: FC<Props> = ({ title, placeHolder, icon, name = '', handleChange, errors }: Props) => {
+const Input: FC<Props> = ({
+  title,
+  placeHolder,
+  icon,
+  name = '',
+  handleChange,
+  errors,
+  width = '100%'
+}: Props) => {
   return (
     <View style={styles.inputContainer}>
-      <View style={styles.inputMainContainer}>
+      <View style={[styles.inputMainContainer, { width }]}>
         <Text style={styles.inputHeading}>{title}</Text>
         <View style={styles.inputWrapper}>
           <KeyboardAvoidingView
@@ -58,7 +67,6 @@ const styles = StyleSheet.create({
   },
 
   inputMainContainer: {
-    width: '100%',
     justifyContent: 'center',
     borderBottomWidth: 1,
     borderColor: Colors.grey,

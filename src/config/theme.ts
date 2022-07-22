@@ -4,6 +4,7 @@ export const Colors = {
   white: '#ffffff',
   grey: '#969696',
   lightGrey: '#cecece',
+  lightGrey2: '#eaeaea',
   danger: '#cc4b4b'
 }
 

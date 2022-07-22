@@ -16,7 +16,7 @@ const LoadingModal: FC<Props> = ({ show, transparent = false }: Props) => {
     <Modal
       visible={show}
       transparent={true}
-      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center', zIndex: 100 }}
     >
       <View
         style={{

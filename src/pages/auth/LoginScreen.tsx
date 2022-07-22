@@ -12,9 +12,10 @@ import LoadingModal from '../../components/common/LoadingModal'
 import { getCurrentUser, loginUser } from '../../services/user'
 import { loginFields, Token, User } from '../../utils/constants'
 
-import { Colors } from '../../config/theme'
+import { Colors, toastTheme } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 import { RootStackParams } from '../../../App'
+import { useToast } from 'react-native-styled-toast'
 
 interface valuesOb {
   email: string
@@ -26,6 +27,7 @@ type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 const Login: FC<Props> = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false)
   const [login, setLogin] = useState(false)
+  const { toast } = useToast()
 
   const loginHandle = async (values: valuesOb) => {
     try {
@@ -35,6 +37,10 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       navigation.navigate('Home', { name: '' })
     } catch (error) {
       console.log(error)
+      toast({
+        message: 'Error while adding restaurant!',
+        ...toastTheme.error
+      })
     }
     setLoading(false)
   }

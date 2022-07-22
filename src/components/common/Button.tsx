@@ -5,24 +5,34 @@ import { Colors } from '../../config/theme'
 
 interface Props {
   name: string
-  width?: string
+  width?: string | number
   handleSubmit?: () => void
+  height?: string | number
+  backgroundColor?: string
+  fontSize?: number
+  ButtonStyle?: object
 }
 
-const Button: FC<Props> = ({ name, width, handleSubmit }: Props) => (
+const Button: FC<Props> = ({
+  name,
+  width,
+  handleSubmit,
+  height = RFPercentage(5.6),
+  backgroundColor = Colors.secondary,
+  fontSize = RFPercentage(2.3),
+  ButtonStyle
+}: Props) => (
   <TouchableOpacity
     activeOpacity={0.7}
     onPress={handleSubmit}
-    style={[styles.buttonContainer, { width }]}
+    style={[styles.buttonContainer, { width, height, backgroundColor }, ButtonStyle]}
   >
-    <Text style={styles.buttonName}>{name}</Text>
+    <Text style={[styles.buttonName, { fontSize }]}>{name}</Text>
   </TouchableOpacity>
 )
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    backgroundColor: Colors.secondary,
-    height: RFPercentage(5.6),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
@@ -30,8 +40,7 @@ const styles = StyleSheet.create({
   },
 
   buttonName: {
-    color: Colors.white,
-    fontSize: RFPercentage(2.3)
+    color: Colors.white
   }
 })
 

@@ -11,16 +11,18 @@ import {
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Picker } from '@react-native-picker/picker'
 import { useToast } from 'react-native-styled-toast'
+import { MaterialIcons } from '@expo/vector-icons'
 
 import { homeBars } from '../utils/constants'
 import Button from '../components/common/Button'
-
-import headerImg from '../../assets/header.jpg'
-import { Colors, toastTheme } from '../config/theme'
 import Input from '../components/common/Input'
 import { addRestaurant, getUserRestaurant } from '../services/restaurant'
 import LoadingModal from '../components/common/LoadingModal'
 import { getToken } from '../utils/getToken'
+
+import { Colors, toastTheme } from '../config/theme'
+import headerImg from '../../assets/header.jpg'
+import ItemModal from '../components/itemModal'
 
 interface RestItems {
   __v: number
@@ -28,14 +30,19 @@ interface RestItems {
   name: string
   userId: string
 }
+interface PickerItems {
+  label: string
+  value: string
+}
 
 const Home: FC = () => {
-  const [selectedItem, setItem] = useState('')
+  const [selectedRestId, setRestId] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
   const [restName, setRestName] = useState('')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const [restPickItems, setRestPickItems] = useState([{ label: 'label1', value: 1 }])
+  const [showItemModal, setShowItemModal] = useState(false)
+  const [restPickItems, setRestPickItems] = useState<PickerItems[]>([])
 
   const handleRestName = (name: string) => {
     if (name) {
@@ -55,7 +62,13 @@ const Home: FC = () => {
         return { label: item.name, value: item._id }
       })
       setRestPickItems(allRest)
-    } catch (error) {}
+      setRestId(allRest[0].value)
+    } catch (error) {
+      toast({
+        message: 'Error while getting restaurant!',
+        ...toastTheme.error
+      })
+    }
   }
 
   const handleRestaurant = async () => {
@@ -86,9 +99,71 @@ const Home: FC = () => {
     }
   }
 
+  const handleItemQuantity = () => {}
+
+  const addRestaurantComponent = (
+    <View style={styles.restContainer}>
+      <Input
+        title='Restaurant Name'
+        placeHolder='Enter restaurant name'
+        handleChange={handleRestName}
+      />
+      <View style={styles.addResBtn}>
+        <Button handleSubmit={handleRestaurant} name='Add Restaurant' />
+      </View>
+    </View>
+  )
+
+  const restaurantItemsComponent = (
+    <View style={styles.restItemsComponent}>
+      <Picker
+        style={styles.pickerStyle}
+        mode='dropdown'
+        placeholder='Select Restaurant'
+        selectedValue={selectedRestId}
+        onValueChange={(itemValue, itemIndex) => setRestId(itemValue)}
+      >
+        {restPickItems.map(item => (
+          <Picker.Item key={item.label} label={item.label} value={item.value} />
+        ))}
+      </Picker>
+      <View style={styles.restHeadingWrap}>
+        <Text style={styles.restHeading}>Restaurant Items</Text>
+        <TouchableOpacity
+          onPress={() => setShowItemModal(true)}
+          activeOpacity={0.7}
+          style={styles.itemAddIcon}
+        >
+          <MaterialIcons name='post-add' color={Colors.primary} size={RFPercentage(3)} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.itemContainer}>
+        <Text style={styles.itemName}>Burger</Text>
+        <Text style={styles.itemPrice}>1221 PKR</Text>
+        {/* <View style={styles.quantityWrapper}>
+          <Button
+            name='-'
+            fontSize={RFPercentage(3.3)}
+            width={RFPercentage(4)}
+            height={RFPercentage(4)}
+            backgroundColor={Colors.primary}
+          />
+          <Text>1</Text>
+          <Button
+            name='+'
+            width={RFPercentage(4)}
+            height={RFPercentage(4)}
+            backgroundColor={Colors.primary}
+          />
+        </View> */}
+      </View>
+    </View>
+  )
+
   return (
     <View style={styles.mainContainer}>
       <LoadingModal show={loading} />
+      <ItemModal show={showItemModal} setShowItemModal={setShowItemModal} restId={selectedRestId} />
       <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
         <StatusBar backgroundColor='transparent' translucent={true} />
       </ImageBackground>
@@ -108,31 +183,7 @@ const Home: FC = () => {
             </TouchableOpacity>
           ))}
         </View>
-
-        {currentBar === 'rest' ? (
-          <View style={styles.restContainer}>
-            <Input
-              title='Restaurant Name'
-              placeHolder='Enter restaurant name'
-              handleChange={handleRestName}
-            />
-            <View style={styles.addResBtn}>
-              <Button handleSubmit={handleRestaurant} name='Add Restaurant' />
-            </View>
-          </View>
-        ) : (
-          <Picker
-            style={styles.pickerStyle}
-            mode='dropdown'
-            placeholder='Select Restaurant'
-            selectedValue={selectedItem}
-            onValueChange={(itemValue, itemIndex) => setItem(itemValue)}
-          >
-            {restPickItems.map(item => (
-              <Picker.Item key={item.label} label={item.label} value={item.value} />
-            ))}
-          </Picker>
-        )}
+        {currentBar === 'rest' ? addRestaurantComponent : restaurantItemsComponent}
       </View>
     </View>
   )
@@ -196,6 +247,64 @@ const styles = StyleSheet.create({
 
   addResBtn: {
     marginTop: RFPercentage(4)
+  },
+
+  restItemsComponent: {
+    width: '100%',
+    alignItems: 'center'
+  },
+
+  itemContainer: {
+    width: '90%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: RFPercentage(2)
+  },
+
+  restHeadingWrap: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.4,
+    width: '90%',
+    paddingBottom: 10,
+    borderBottomColor: Colors.lightGrey,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: RFPercentage(2)
+  },
+
+  restHeading: {
+    width: '50%',
+    fontSize: RFPercentage(3),
+    alignSelf: 'flex-start',
+    marginTop: RFPercentage(2),
+    marginBottom: RFPercentage(2),
+    fontWeight: '600',
+    color: Colors.secondary
+  },
+
+  itemName: {
+    fontSize: RFPercentage(2.2),
+    fontWeight: '500'
+  },
+
+  itemPrice: {
+    fontSize: RFPercentage(2),
+    marginLeft: RFPercentage(3)
+  },
+
+  itemAddIcon: {
+    backgroundColor: Colors.lightGrey2,
+    padding: 4,
+    borderRadius: 5,
+    elevation: 3
+  },
+
+  quantityWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '30%',
+    justifyContent: 'space-around'
   }
 })
 

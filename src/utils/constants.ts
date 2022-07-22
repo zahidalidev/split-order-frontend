@@ -76,7 +76,7 @@ export const homeBars = [
   {
     id: 0,
     name: 'item',
-    title: 'Add Items'
+    title: 'Restaurant Items'
   },
   {
     id: 1,
