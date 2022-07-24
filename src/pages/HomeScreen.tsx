@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react'
 import {
   Alert,
+  FlatList,
   ImageBackground,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -182,12 +184,19 @@ const Home: FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-      {currentRestItems.map(item => (
-        <View key={item._id} style={styles.itemContainer}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemPrice}>{item.price} PKR</Text>
-        </View>
-      ))}
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        numColumns={2}
+        style={styles.itemScrollContaier}
+        data={currentRestItems}
+        keyExtractor={item => item._id}
+        renderItem={({ item }) => (
+          <View key={item._id} style={styles.itemContainer}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <Text style={styles.itemPrice}>{item.price} PKR</Text>
+          </View>
+        )}
+      />
     </View>
   )
 
@@ -293,8 +302,12 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
+  itemScrollContaier: {
+    width: '90%'
+  },
+
   itemContainer: {
-    width: '90%',
+    width: '50%',
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
