@@ -12,6 +12,12 @@ export const getCurrentUser = async (token: string) =>
     }
   })
 
+export const getAllUsers = async (token: string) =>
+  await axios.get(`${nodeApi}/users/all`, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
 interface Register {
   fullName: string
   email: string

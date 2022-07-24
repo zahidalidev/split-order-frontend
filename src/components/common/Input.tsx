@@ -17,6 +17,7 @@ interface Props {
   handleChange: Function
   errors?: ErrorsOptions
   width?: string | number
+  formik?: boolean
 }
 
 const Input: FC<Props> = ({
@@ -26,7 +27,8 @@ const Input: FC<Props> = ({
   name = '',
   handleChange,
   errors,
-  width = '100%'
+  width = '100%',
+  formik = true
 }: Props) => {
   return (
     <View style={styles.inputContainer}>
@@ -37,12 +39,20 @@ const Input: FC<Props> = ({
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1, width: '100%' }}
           >
-            <TextInput
-              onChangeText={text => handleChange(text)}
-              name={name}
-              style={[styles.input, { marginTop: icon || 7, marginBottom: icon || 7 }]}
-              placeholder={placeHolder}
-            />
+            {formik ? (
+              <TextInput
+                onChangeText={handleChange(name)}
+                name={name}
+                style={[styles.input, { marginTop: 7, marginBottom: 7 }]}
+                placeholder={placeHolder}
+              />
+            ) : (
+              <TextInput
+                onChangeText={text => handleChange(text)}
+                style={[styles.input, { marginTop: 7, marginBottom: 7 }]}
+                placeholder={placeHolder}
+              />
+            )}
           </KeyboardAvoidingView>
           {icon && (
             <FontAwesome

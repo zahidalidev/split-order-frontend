@@ -81,6 +81,7 @@ const ItemModal: FC<Props> = ({ show, restId, setShowItemModal }: Props) => {
             <Input
               width='80%'
               key={item.id.toString()}
+              formik={false}
               title={item.title}
               placeHolder={item.placeHolder}
               handleChange={(text: string) => handleChange(item.id, text)}

@@ -38,7 +38,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     } catch (error) {
       console.log(error)
       toast({
-        message: 'Error while adding restaurant!',
+        message: 'Login Error!',
         ...toastTheme.error
       })
     }
@@ -54,7 +54,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     } catch (error: any) {
       setLogin(true)
       console.log('Login error: ', error.message)
-      navigation.navigate('Login', { name: '' })
+      // navigation.navigate('Login', { name: '' })
     }
   }
 

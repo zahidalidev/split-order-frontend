@@ -22,7 +22,18 @@ export const getUserRestaurant = async (token: string) =>
   })
 
 export const addItem = async (body: RestaurantItem, token: string) =>
-  await axios.post(`${restEndpoint}/item`, body)
+  await axios.post(`${restEndpoint}/item`, body, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
+
+export const getRestaurantItems = async (restId: string, token: string) =>
+  await axios.get(`${restEndpoint}/items/${restId}`, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
 
 interface RestaurantItem {
   name: string

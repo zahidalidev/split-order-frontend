@@ -16,13 +16,14 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { homeBars } from '../utils/constants'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
-import { addRestaurant, getUserRestaurant } from '../services/restaurant'
+import { addRestaurant, getRestaurantItems, getUserRestaurant } from '../services/restaurant'
 import LoadingModal from '../components/common/LoadingModal'
 import { getToken } from '../utils/getToken'
 
 import { Colors, toastTheme } from '../config/theme'
 import headerImg from '../../assets/header.jpg'
 import ItemModal from '../components/itemModal'
+import UserSelectModal from '../components/userSelectModal'
 
 interface RestItems {
   __v: number
@@ -34,6 +35,13 @@ interface PickerItems {
   label: string
   value: string
 }
+interface CurrentItems {
+  __v: number
+  _id: string
+  name: string
+  price: number
+  restId: string
+}
 
 const Home: FC = () => {
   const [selectedRestId, setRestId] = useState('')
@@ -42,7 +50,9 @@ const Home: FC = () => {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const [showItemModal, setShowItemModal] = useState(false)
+  const [showSelectUserModal, setShowSelectUserModal] = useState(false)
   const [restPickItems, setRestPickItems] = useState<PickerItems[]>([])
+  const [currentRestItems, setCurrentRestItems] = useState<CurrentItems[]>([])
 
   const handleRestName = (name: string) => {
     if (name) {
@@ -54,6 +64,19 @@ const Home: FC = () => {
     allUserRestaurents()
   }, [])
 
+  const getAllItems = async (restId: string) => {
+    try {
+      const token = await getToken()
+      const { data } = await getRestaurantItems(restId, token || '')
+      setCurrentRestItems(data)
+    } catch (error) {
+      toast({
+        message: 'Error while getting items!',
+        ...toastTheme.error
+      })
+    }
+  }
+
   const allUserRestaurents = async () => {
     try {
       const token = await getToken()
@@ -62,7 +85,9 @@ const Home: FC = () => {
         return { label: item.name, value: item._id }
       })
       setRestPickItems(allRest)
-      setRestId(allRest[0].value)
+      const restId = allRest[0].value
+      setRestId(restId)
+      getAllItems(restId)
     } catch (error) {
       toast({
         message: 'Error while getting restaurant!',
@@ -99,14 +124,13 @@ const Home: FC = () => {
     }
   }
 
-  const handleItemQuantity = () => {}
-
   const addRestaurantComponent = (
     <View style={styles.restContainer}>
       <Input
         title='Restaurant Name'
         placeHolder='Enter restaurant name'
         handleChange={handleRestName}
+        formik={false}
       />
       <View style={styles.addResBtn}>
         <Button handleSubmit={handleRestaurant} name='Add Restaurant' />
@@ -129,34 +153,29 @@ const Home: FC = () => {
       </Picker>
       <View style={styles.restHeadingWrap}>
         <Text style={styles.restHeading}>Restaurant Items</Text>
-        <TouchableOpacity
-          onPress={() => setShowItemModal(true)}
-          activeOpacity={0.7}
-          style={styles.itemAddIcon}
-        >
-          <MaterialIcons name='post-add' color={Colors.primary} size={RFPercentage(3)} />
-        </TouchableOpacity>
+        <View style={styles.headingIconContainer}>
+          <TouchableOpacity
+            onPress={() => setShowSelectUserModal(true)}
+            activeOpacity={0.7}
+            style={[styles.itemAddIcon, styles.addUserIcon]}
+          >
+            <MaterialIcons name='person-add-alt' color={Colors.primary} size={RFPercentage(3)} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowItemModal(true)}
+            activeOpacity={0.7}
+            style={styles.itemAddIcon}
+          >
+            <MaterialIcons name='post-add' color={Colors.primary} size={RFPercentage(3)} />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemName}>Burger</Text>
-        <Text style={styles.itemPrice}>1221 PKR</Text>
-        {/* <View style={styles.quantityWrapper}>
-          <Button
-            name='-'
-            fontSize={RFPercentage(3.3)}
-            width={RFPercentage(4)}
-            height={RFPercentage(4)}
-            backgroundColor={Colors.primary}
-          />
-          <Text>1</Text>
-          <Button
-            name='+'
-            width={RFPercentage(4)}
-            height={RFPercentage(4)}
-            backgroundColor={Colors.primary}
-          />
-        </View> */}
-      </View>
+      {currentRestItems.map(item => (
+        <View key={item._id} style={styles.itemContainer}>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemPrice}>{item.price} PKR</Text>
+        </View>
+      ))}
     </View>
   )
 
@@ -164,6 +183,11 @@ const Home: FC = () => {
     <View style={styles.mainContainer}>
       <LoadingModal show={loading} />
       <ItemModal show={showItemModal} setShowItemModal={setShowItemModal} restId={selectedRestId} />
+      <UserSelectModal
+        show={showSelectUserModal}
+        setShowItemModal={setShowSelectUserModal}
+        restId={selectedRestId}
+      />
       <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
         <StatusBar backgroundColor='transparent' translucent={true} />
       </ImageBackground>
@@ -176,7 +200,9 @@ const Home: FC = () => {
               onPress={() => handleCurrentBar(item.name)}
               style={[
                 styles.bar,
-                { backgroundColor: currentBar === item.name ? Colors.primary : Colors.lightGrey }
+                {
+                  backgroundColor: currentBar === item.name ? Colors.primary : Colors.lightGrey
+                }
               ]}
             >
               <Text style={styles.barContent}>{item.title}</Text>
@@ -300,11 +326,12 @@ const styles = StyleSheet.create({
     elevation: 3
   },
 
-  quantityWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '30%',
-    justifyContent: 'space-around'
+  addUserIcon: {
+    marginRight: RFPercentage(2)
+  },
+
+  headingIconContainer: {
+    flexDirection: 'row'
   }
 })
 
