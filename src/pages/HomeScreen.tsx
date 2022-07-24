@@ -12,6 +12,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Picker } from '@react-native-picker/picker'
 import { useToast } from 'react-native-styled-toast'
 import { MaterialIcons } from '@expo/vector-icons'
+import { Badge } from 'react-native-paper'
 
 import { homeBars } from '../utils/constants'
 import Button from '../components/common/Button'
@@ -43,6 +44,10 @@ interface CurrentItems {
   restId: string
 }
 
+interface SelectedUser {
+  userId: string
+}
+
 const Home: FC = () => {
   const [selectedRestId, setRestId] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
@@ -53,6 +58,7 @@ const Home: FC = () => {
   const [showSelectUserModal, setShowSelectUserModal] = useState(false)
   const [restPickItems, setRestPickItems] = useState<PickerItems[]>([])
   const [currentRestItems, setCurrentRestItems] = useState<CurrentItems[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])
 
   const handleRestName = (name: string) => {
     if (name) {
@@ -159,6 +165,12 @@ const Home: FC = () => {
             activeOpacity={0.7}
             style={[styles.itemAddIcon, styles.addUserIcon]}
           >
+            <Badge
+              size={18}
+              style={{ position: 'absolute', top: -10, right: -5, backgroundColor: Colors.primary }}
+            >
+              {selectedUsers.length}
+            </Badge>
             <MaterialIcons name='person-add-alt' color={Colors.primary} size={RFPercentage(3)} />
           </TouchableOpacity>
           <TouchableOpacity
@@ -187,6 +199,7 @@ const Home: FC = () => {
         show={showSelectUserModal}
         setShowItemModal={setShowSelectUserModal}
         restId={selectedRestId}
+        selectUsers={setSelectedUsers}
       />
       <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
         <StatusBar backgroundColor='transparent' translucent={true} />
