@@ -1,11 +1,10 @@
-import { FC, useEffect, useState, useRef } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Formik } from 'formik'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useToast } from 'react-native-styled-toast'
-import * as Notifications from 'expo-notifications'
 
 import Input from '../../components/common/Input'
 import Button from '../../components/common/Button'
@@ -19,14 +18,6 @@ import { getPushNotificationsToken } from '../../components/common/Notification'
 import { Colors, toastTheme } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false
-  })
-})
-
 interface valuesOb {
   email: string
   password: string
@@ -35,10 +26,6 @@ interface valuesOb {
 type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const Login: FC<Props> = ({ navigation }: Props) => {
-  const [notification, setNotification] = useState<Notifications.Notification>()
-  const notificationListener: React.MutableRefObject<object> = useRef({})
-  const responseListener: React.MutableRefObject<object> = useRef({})
-
   const [loading, setLoading] = useState(false)
   const [login, setLogin] = useState(false)
   const { toast } = useToast()
@@ -69,31 +56,14 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       await AsyncStorage.setItem(User, JSON.stringify(data))
       navigation.navigate('Home', { name: '' })
     } catch (error: any) {
-      setLogin(true)
       console.log('Login error: ', error.message)
       // navigation.navigate('Login', { name: '' })
     }
-  }
-
-  const listenPushNotification = () => {
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      console.log('notification app: ', notification)
-      setNotification(notification)
-    })
-
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('response app: ', response.notification.request.content.data)
-    })
-
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current)
-      Notifications.removeNotificationSubscription(responseListener.current)
-    }
+    setLogin(true)
   }
 
   useEffect(() => {
     getUser()
-    listenPushNotification()
   }, [])
 
   return !login ? (

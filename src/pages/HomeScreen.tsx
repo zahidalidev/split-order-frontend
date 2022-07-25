@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState, useRef } from 'react'
 import {
   Alert,
   FlatList,
@@ -16,6 +16,7 @@ import { useToast } from 'react-native-styled-toast'
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Badge } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import * as Notifications from 'expo-notifications'
 
 import { homeBars, Token, User } from '../utils/constants'
 import Button from '../components/common/Button'
@@ -57,6 +58,7 @@ interface SelectedUser {
 interface NotificationData {
   from_id: string
   rest_id: string
+  url: string
 }
 interface PushNotification {
   to: string
@@ -64,6 +66,14 @@ interface PushNotification {
   body: string
   data: NotificationData
 }
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false
+  })
+})
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
 
@@ -79,15 +89,37 @@ const Home: FC<Props> = ({ navigation }: Props) => {
   const [currentRestItems, setCurrentRestItems] = useState<CurrentItems[]>([])
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])
 
+  const [notification, setNotification] = useState<Notifications.Notification>()
+  const notificationListener: React.MutableRefObject<object> = useRef({})
+  const responseListener: React.MutableRefObject<object> = useRef({})
+
+  useEffect(() => {
+    allUserRestaurents()
+    listenPushNotification()
+  }, [])
+
+  const listenPushNotification = () => {
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification)
+    })
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      if (response.notification.request.content.data.from_id) {
+        navigation.navigate('SelectItems', { name: '' })
+      }
+    })
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current)
+      Notifications.removeNotificationSubscription(responseListener.current)
+    }
+  }
+
   const handleRestName = (name: string) => {
     if (name) {
       setRestName(name)
     }
   }
-
-  useEffect(() => {
-    allUserRestaurents()
-  }, [])
 
   const getAllItems = async (restId: string) => {
     try {
@@ -162,7 +194,7 @@ const Home: FC<Props> = ({ navigation }: Props) => {
             to: item.pushToken,
             sound: 'default',
             body: `You recieved an invitation from ${currentUser.fullName}`,
-            data: { from_id: currentUser._id, rest_id: selectedRestId }
+            data: { from_id: currentUser._id, rest_id: selectedRestId, url: 'SelectItems' }
           })
         }
       })
