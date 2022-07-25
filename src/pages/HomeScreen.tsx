@@ -29,7 +29,7 @@ import UserSelectModal from '../components/userSelectModal'
 import { Colors, toastTheme } from '../config/theme'
 import headerImg from '../../assets/header.jpg'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { RootStackParams } from '../../App'
+import { RootStackParams } from '../components/Routes'
 import { SentNotification } from '../utils/SendNotification'
 
 interface RestItems {

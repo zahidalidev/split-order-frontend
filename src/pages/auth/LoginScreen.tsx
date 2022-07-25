@@ -14,7 +14,7 @@ import { loginFields, Token, User } from '../../utils/constants'
 
 import { Colors, toastTheme } from '../../config/theme'
 import logo from '../../../assets/logo.png'
-import { RootStackParams } from '../../../App'
+import { RootStackParams } from '../../components/Routes'
 import { useToast } from 'react-native-styled-toast'
 import { getPushNotificationsToken } from '../../components/common/Notification'
 

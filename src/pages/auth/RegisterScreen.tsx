@@ -22,7 +22,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 import { Colors } from '../../config/theme'
 import logo from '../../../assets/logo.png'
-import { RootStackParams } from '../../../App'
+import { RootStackParams } from '../../components/Routes'
 import { registerFields } from '../../utils/constants'
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
