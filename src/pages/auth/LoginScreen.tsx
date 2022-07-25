@@ -37,6 +37,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       const tempValues = { ...values, pushToken }
       const { data } = await loginUser(tempValues)
       AsyncStorage.setItem(Token, JSON.stringify(data))
+      await getUser()
       navigation.navigate('Home', { name: '' })
     } catch (error) {
       console.log(error)
@@ -57,7 +58,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     } catch (error: any) {
       setLogin(true)
       console.log('Login error: ', error.message)
-      navigation.navigate('Login', { name: '' })
+      // navigation.navigate('Login', { name: '' })
     }
   }
 

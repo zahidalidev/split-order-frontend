@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { Subscription } from 'expo-modules-core'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ThemeProvider } from 'styled-components'
@@ -38,15 +39,16 @@ const RootStack = createNativeStackNavigator<RootStackParams>()
 const App: FC = () => {
   const [notification, setNotification] = useState<Notifications.Notification>()
   const notificationListener: React.MutableRefObject<object> = useRef({})
-  const responseListener = useRef()
+  const responseListener: React.MutableRefObject<object> = useRef({})
 
   useEffect(() => {
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification =>
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('notification app: ', notification)
       setNotification(notification)
-    )
+    })
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('response app notification: ', response, notification)
+      console.log('response app: ', response.notification.request.content.data)
     })
 
     return () => {

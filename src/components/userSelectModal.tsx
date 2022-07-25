@@ -7,12 +7,12 @@ import CheckBox from 'expo-checkbox'
 import { Colors, toastTheme } from '../config/theme'
 import { addItem } from '../services/restaurant'
 import { getAllUsers } from '../services/user'
-import { getToken } from '../utils/getToken'
+import { getToken } from '../utils/getFromStorage'
 import Button from './common/Button'
 import Input from './common/Input'
 
 interface SelectedUser {
-  userId: string
+  pushToken: string
 }
 interface Props {
   show: boolean
@@ -29,6 +29,7 @@ interface User {
   fullName: string
   number: number
   selected: boolean
+  pushToken: string
 }
 
 const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUsers }: Props) => {
@@ -61,7 +62,9 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
     const tempUsers: SelectedUser[] = []
     users.forEach(item => {
       if (item.selected) {
-        tempUsers.push({ userId: item._id })
+        tempUsers.push({
+          pushToken: item.pushToken || ''
+        })
       }
     })
     selectUsers(tempUsers)
@@ -160,7 +163,7 @@ const styles = StyleSheet.create({
     width: '90%',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    marginTop: RFPercentage(1.7)
+    marginTop: RFPercentage(2)
   },
 
   userName: {

@@ -5,7 +5,7 @@ import { useToast } from 'react-native-styled-toast'
 
 import { Colors, toastTheme } from '../config/theme'
 import { addItem } from '../services/restaurant'
-import { getToken } from '../utils/getToken'
+import { getToken } from '../utils/getFromStorage'
 import Button from './common/Button'
 import Input from './common/Input'
 
@@ -48,7 +48,6 @@ const ItemModal: FC<Props> = ({ show, restId, setShowItemModal }: Props) => {
   const handleRestItem = async () => {
     setShowItemModal(false)
     showLoading(true)
-    console.log('restId: ', restId)
     try {
       const token = await getToken()
       const body: RestaurantItem = {

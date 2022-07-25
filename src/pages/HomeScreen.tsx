@@ -17,12 +17,12 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Badge } from 'react-native-paper'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-import { homeBars, Token } from '../utils/constants'
+import { homeBars, Token, User } from '../utils/constants'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { addRestaurant, getRestaurantItems, getUserRestaurant } from '../services/restaurant'
 import LoadingModal from '../components/common/LoadingModal'
-import { getToken } from '../utils/getToken'
+import { getStoreUser, getToken } from '../utils/getFromStorage'
 import ItemModal from '../components/itemModal'
 import UserSelectModal from '../components/userSelectModal'
 
@@ -30,6 +30,7 @@ import { Colors, toastTheme } from '../config/theme'
 import headerImg from '../../assets/header.jpg'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RootStackParams } from '../../App'
+import { SentNotification } from '../utils/SendNotification'
 
 interface RestItems {
   __v: number
@@ -50,7 +51,18 @@ interface CurrentItems {
 }
 
 interface SelectedUser {
-  userId: string
+  pushToken: string
+}
+
+interface NotificationData {
+  from_id: string
+  rest_id: string
+}
+interface PushNotification {
+  to: string
+  sound: string
+  body: string
+  data: NotificationData
 }
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
@@ -138,38 +150,33 @@ const Home: FC<Props> = ({ navigation }: Props) => {
   }
 
   const handleInviteUsers = async () => {
-    const arr = [
-      {
-        to: 'ExponentPushToken[lWY5-lIc1Mav3nWYcBfzV_]',
-        sound: 'default',
-        body: 'Hello world!'
-      }
-    ]
-    fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(arr)
-    })
-      .then(response => response.json())
-      .then(responseJson => {
-        console.log('responseJson new: ', responseJson)
-      })
-      .catch(error => {
-        console.log('notify error: ', error)
-      })
-
     if (selectedUsers.length === 0) {
       return toast({ message: 'Please select atleast 1 user', ...toastTheme.error })
+    }
+    try {
+      const arr: PushNotification[] = []
+      const currentUser = await getStoreUser()
+      selectedUsers.forEach(item => {
+        if (item.pushToken) {
+          arr.push({
+            to: item.pushToken,
+            sound: 'default',
+            body: `You recieved an invitation from ${currentUser.fullName}`,
+            data: { from_id: currentUser._id, rest_id: selectedRestId }
+          })
+        }
+      })
+      await SentNotification(arr)
+      toast({ message: 'Notification sent!' })
+    } catch (error) {
+      toast({ message: 'Error in sending notification!', ...toastTheme.colors })
     }
   }
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem(Token)
+      await AsyncStorage.removeItem(User)
       navigation.navigate('Login', { name: '' })
     } catch (error) {
       toast({ message: 'Logout Error!', ...toastTheme.error })
