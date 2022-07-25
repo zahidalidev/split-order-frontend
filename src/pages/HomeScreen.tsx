@@ -13,20 +13,23 @@ import {
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Picker } from '@react-native-picker/picker'
 import { useToast } from 'react-native-styled-toast'
-import { MaterialIcons } from '@expo/vector-icons'
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Badge } from 'react-native-paper'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-import { homeBars } from '../utils/constants'
+import { homeBars, Token } from '../utils/constants'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { addRestaurant, getRestaurantItems, getUserRestaurant } from '../services/restaurant'
 import LoadingModal from '../components/common/LoadingModal'
 import { getToken } from '../utils/getToken'
+import ItemModal from '../components/itemModal'
+import UserSelectModal from '../components/userSelectModal'
 
 import { Colors, toastTheme } from '../config/theme'
 import headerImg from '../../assets/header.jpg'
-import ItemModal from '../components/itemModal'
-import UserSelectModal from '../components/userSelectModal'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { RootStackParams } from '../../App'
 
 interface RestItems {
   __v: number
@@ -50,7 +53,9 @@ interface SelectedUser {
   userId: string
 }
 
-const Home: FC = () => {
+type Props = NativeStackScreenProps<RootStackParams, 'Login'>
+
+const Home: FC<Props> = ({ navigation }: Props) => {
   const [selectedRestId, setRestId] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
   const [restName, setRestName] = useState('')
@@ -132,6 +137,45 @@ const Home: FC = () => {
     }
   }
 
+  const handleInviteUsers = async () => {
+    const arr = [
+      {
+        to: 'ExponentPushToken[lWY5-lIc1Mav3nWYcBfzV_]',
+        sound: 'default',
+        body: 'Hello world!'
+      }
+    ]
+    fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(arr)
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log('responseJson new: ', responseJson)
+      })
+      .catch(error => {
+        console.log('notify error: ', error)
+      })
+
+    if (selectedUsers.length === 0) {
+      return toast({ message: 'Please select atleast 1 user', ...toastTheme.error })
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem(Token)
+      navigation.navigate('Login', { name: '' })
+    } catch (error) {
+      toast({ message: 'Logout Error!', ...toastTheme.error })
+    }
+  }
+
   const addRestaurantComponent = (
     <View style={styles.restContainer}>
       <Input
@@ -197,11 +241,24 @@ const Home: FC = () => {
           </View>
         )}
       />
+      <Button
+        name='Invite Users'
+        backgroundColor={Colors.primary}
+        width='60%'
+        ButtonStyle={styles.inviteBtn}
+        handleSubmit={handleInviteUsers}
+      />
     </View>
   )
 
   return (
     <View style={styles.mainContainer}>
+      <TouchableOpacity
+        onPress={handleLogout}
+        style={{ position: 'absolute', left: RFPercentage(3), top: RFPercentage(5), zIndex: 2 }}
+      >
+        <MaterialCommunityIcons name='exit-to-app' size={RFPercentage(3)} color={Colors.white} />
+      </TouchableOpacity>
       <LoadingModal show={loading} />
       <ItemModal show={showItemModal} setShowItemModal={setShowItemModal} restId={selectedRestId} />
       <UserSelectModal
@@ -298,12 +355,19 @@ const styles = StyleSheet.create({
   },
 
   restItemsComponent: {
+    flex: 1,
     width: '100%',
     alignItems: 'center'
   },
 
   itemScrollContaier: {
-    width: '90%'
+    width: '90%',
+    marginBottom: RFPercentage(15)
+  },
+
+  inviteBtn: {
+    position: 'absolute',
+    bottom: RFPercentage(4)
   },
 
   itemContainer: {

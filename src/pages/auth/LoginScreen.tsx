@@ -16,6 +16,7 @@ import { Colors, toastTheme } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 import { RootStackParams } from '../../../App'
 import { useToast } from 'react-native-styled-toast'
+import { getPushNotificationsToken } from '../../components/common/Notification'
 
 interface valuesOb {
   email: string
@@ -30,9 +31,11 @@ const Login: FC<Props> = ({ navigation }: Props) => {
   const { toast } = useToast()
 
   const loginHandle = async (values: valuesOb) => {
+    const pushToken = await getPushNotificationsToken()
     try {
       setLoading(true)
-      const { data } = await loginUser(values)
+      const tempValues = { ...values, pushToken }
+      const { data } = await loginUser(tempValues)
       AsyncStorage.setItem(Token, JSON.stringify(data))
       navigation.navigate('Home', { name: '' })
     } catch (error) {
@@ -54,7 +57,7 @@ const Login: FC<Props> = ({ navigation }: Props) => {
     } catch (error: any) {
       setLogin(true)
       console.log('Login error: ', error.message)
-      // navigation.navigate('Login', { name: '' })
+      navigation.navigate('Login', { name: '' })
     }
   }
 
