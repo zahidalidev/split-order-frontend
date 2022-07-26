@@ -104,8 +104,10 @@ const Home: FC<Props> = ({ navigation }: Props) => {
     })
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      if (response.notification.request.content.data.from_id) {
-        navigation.navigate('SelectItems', { name: '' })
+      const { from_id, rest_id } = response.notification.request.content.data
+
+      if (from_id) {
+        navigation.navigate('SelectItems', { from_id, rest_id })
       }
     })
 
