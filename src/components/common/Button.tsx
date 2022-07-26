@@ -11,6 +11,7 @@ interface Props {
   backgroundColor?: string
   fontSize?: number
   ButtonStyle?: object
+  disable?: boolean
 }
 
 const Button: FC<Props> = ({
@@ -20,12 +21,18 @@ const Button: FC<Props> = ({
   height = RFPercentage(5.6),
   backgroundColor = Colors.secondary,
   fontSize = RFPercentage(2.3),
-  ButtonStyle
+  ButtonStyle,
+  disable = false
 }: Props) => (
   <TouchableOpacity
+    disabled={disable}
     activeOpacity={0.7}
     onPress={handleSubmit}
-    style={[styles.buttonContainer, { width, height, backgroundColor }, ButtonStyle]}
+    style={[
+      styles.buttonContainer,
+      { width, height, backgroundColor: disable ? Colors.grey : backgroundColor },
+      ButtonStyle
+    ]}
   >
     <Text style={[styles.buttonName, { fontSize }]}>{name}</Text>
   </TouchableOpacity>

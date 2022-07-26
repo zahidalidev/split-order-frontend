@@ -62,6 +62,7 @@ const ItemSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectItem
     const tempItems: CurrentItems[] = []
     items.forEach(item => {
       if (item.selected) {
+        item.quantity = 0
         tempItems.push(item)
       }
     })

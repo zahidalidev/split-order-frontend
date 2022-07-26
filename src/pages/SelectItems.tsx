@@ -35,7 +35,21 @@ const SelectItems: FC<Props> = (props: Props) => {
     setRestId(props.route.params.rest_id)
   }, [])
 
-  const ItemComponent = (item: CurrentItems) => (
+  const handleDecrement = (index: number) => {
+    const tempItems = [...currentItems]
+    if (tempItems[index].quantity > 0) {
+      tempItems[index].quantity -= 0.5
+      setCurrentItems(tempItems)
+    }
+  }
+
+  const handleIncrement = (index: number) => {
+    const tempItems = [...currentItems]
+    tempItems[index].quantity += 0.5
+    setCurrentItems(tempItems)
+  }
+
+  const ItemComponent = (item: CurrentItems, index: number) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemWrapper}>
         <Text style={styles.itemLabel}>{item.name}</Text>
@@ -43,14 +57,23 @@ const SelectItems: FC<Props> = (props: Props) => {
         <View style={styles.quantityWrapper}>
           <Button
             name='-'
+            disable={item.quantity === 0}
+            handleSubmit={() => handleDecrement(index)}
             fontSize={RFPercentage(3.3)}
             width={RFPercentage(4)}
             height={RFPercentage(4)}
             backgroundColor={Colors.danger}
           />
-          <Text style={styles.quantity}>1</Text>
+          <View style={styles.itemQuantity}>
+            <Text
+              style={[styles.quantity, { color: item.quantity ? Colors.black : Colors.danger }]}
+            >
+              {item.quantity}
+            </Text>
+          </View>
           <Button
             name='+'
+            handleSubmit={() => handleIncrement(index)}
             width={RFPercentage(4)}
             height={RFPercentage(4)}
             backgroundColor={Colors.primary}
@@ -110,7 +133,7 @@ const SelectItems: FC<Props> = (props: Props) => {
         <FlatList
           data={currentItems}
           keyExtractor={item => item._id}
-          renderItem={({ item }) => ItemComponent(item)}
+          renderItem={({ item, index }) => ItemComponent(item, index)}
         />
       ) : (
         <View style={styles.itemNot}>
@@ -154,6 +177,12 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.lightGrey,
     borderBottomWidth: 0.5,
     padding: RFPercentage(2)
+  },
+
+  itemQuantity: {
+    width: RFPercentage(2.5),
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   quantity: {
