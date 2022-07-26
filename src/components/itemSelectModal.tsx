@@ -5,72 +5,67 @@ import { useToast } from 'react-native-styled-toast'
 import CheckBox from 'expo-checkbox'
 
 import { Colors, toastTheme } from '../config/theme'
-import { addItem } from '../services/restaurant'
-import { getAllUsers } from '../services/user'
+import { getRestaurantItems } from '../services/restaurant'
 import { getToken } from '../utils/getFromStorage'
 import Button from './common/Button'
-import Input from './common/Input'
 import LoadingModal from './common/LoadingModal'
 
-interface SelectedUser {
-  pushToken: string
-}
 interface Props {
   show: boolean
   restId: string
   setShowItemModal: Function
-  selectUsers: Dispatch<SetStateAction<SelectedUser[]>>
+  selectItems: Dispatch<SetStateAction<CurrentItems[]>>
 }
 
-interface User {
+interface CurrentItems {
   __v: number
   _id: string
-  address: string
-  email: string
-  fullName: string
-  number: number
+  name: string
+  price: number
+  restId: string
   selected: boolean
-  pushToken: string
+  quantity: number
 }
 
-const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUsers }: Props) => {
+const ItemSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectItems }: Props) => {
   const [loading, showLoading] = useState(false)
-  const [users, setUsers] = useState<User[]>([])
+  const [items, setItems] = useState<CurrentItems[]>([])
   const { toast } = useToast()
 
   useEffect(() => {
-    handleAllUsers()
-  }, [])
+    handleAllRestItems()
+  }, [restId])
 
-  const handleAllUsers = async () => {
+  const handleAllRestItems = async () => {
     try {
       showLoading(true)
       const token = await getToken()
-      const { data } = await getAllUsers(token as string)
-      setUsers(data)
+      console.log('restId modal: ', restId)
+      const { data } = await getRestaurantItems(restId, token || '')
+      setItems(data)
     } catch (error) {
-      toast({ message: 'Gettting users error!', ...toastTheme.error })
+      if (restId) {
+        toast({ message: 'Gettting items error!', ...toastTheme.error })
+      }
     }
     showLoading(false)
   }
 
-  const handleUserSelect = (index: number, value: boolean) => {
-    const tempUsers = [...users]
-    tempUsers[index].selected = value
-    setUsers(tempUsers)
+  const handleItemsSelect = (index: number, value: boolean) => {
+    const tempItems = [...items]
+    tempItems[index].selected = value
+    setItems(tempItems)
   }
 
-  const handleSelectedUsers = async () => {
+  const handleSelectedItems = () => {
     setShowItemModal(false)
-    const tempUsers: SelectedUser[] = []
-    users.forEach(item => {
+    const tempItems: CurrentItems[] = []
+    items.forEach(item => {
       if (item.selected) {
-        tempUsers.push({
-          pushToken: item.pushToken || ''
-        })
+        tempItems.push(item)
       }
     })
-    selectUsers(tempUsers)
+    selectItems(tempItems)
   }
 
   return (
@@ -80,17 +75,17 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
         <View style={styles.itemContainer}>
           <Text style={styles.itemDetailsHeading}>Select users to add</Text>
           <ScrollView style={styles.userContainerScroll}>
-            <View style={styles.userContainer}>
-              {users.map((item, index) => (
-                <View key={item._id} style={styles.userCheckContaienr}>
-                  <Text style={styles.userName}>{item.fullName}</Text>
-                  <Text numberOfLines={1} style={styles.userEmail}>
-                    {item.email}
+            <View style={styles.itemScrollContainer}>
+              {items.map((item, index) => (
+                <View key={item._id} style={styles.itemCheckContaienr}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text numberOfLines={1} style={styles.itemPrice}>
+                    {item.price} pkr
                   </Text>
                   <CheckBox
                     style={styles.checkbox}
                     value={item.selected}
-                    onValueChange={newValue => handleUserSelect(index, newValue)}
+                    onValueChange={newValue => handleItemsSelect(index, newValue)}
                     color={item.selected ? Colors.primary : undefined}
                   />
                 </View>
@@ -103,7 +98,7 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
             backgroundColor={Colors.primary}
             height={RFPercentage(5)}
             ButtonStyle={styles.btnStyle}
-            handleSubmit={handleSelectedUsers}
+            handleSubmit={handleSelectedItems}
           />
         </View>
       </View>
@@ -155,14 +150,14 @@ const styles = StyleSheet.create({
     marginBottom: RFPercentage(10)
   },
 
-  userContainer: {
+  itemScrollContainer: {
     flexDirection: 'column',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center'
   },
 
-  userCheckContaienr: {
+  itemCheckContaienr: {
     flexDirection: 'row',
     width: '90%',
     justifyContent: 'space-evenly',
@@ -170,13 +165,13 @@ const styles = StyleSheet.create({
     marginTop: RFPercentage(2)
   },
 
-  userName: {
+  itemName: {
     fontSize: RFPercentage(2.1),
     textAlign: 'left',
     width: '20%'
   },
 
-  userEmail: {
+  itemPrice: {
     fontSize: RFPercentage(2.1),
     marginLeft: 10,
     width: '50%',
@@ -196,4 +191,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default UserSelectModal
+export default ItemSelectModal
