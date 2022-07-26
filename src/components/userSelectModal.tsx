@@ -3,13 +3,12 @@ import { Modal, View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'rea
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { useToast } from 'react-native-styled-toast'
 import CheckBox from 'expo-checkbox'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { Colors, toastTheme } from '../config/theme'
-import { addItem } from '../services/restaurant'
 import { getAllUsers } from '../services/user'
 import { getToken } from '../utils/getFromStorage'
 import Button from './common/Button'
-import Input from './common/Input'
 import LoadingModal from './common/LoadingModal'
 
 interface SelectedUser {
@@ -78,6 +77,9 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
       <LoadingModal show={loading} />
       <View style={styles.backdropModel}>
         <View style={styles.itemContainer}>
+          <TouchableOpacity onPress={() => setShowItemModal(false)} style={styles.modelCross}>
+            <MaterialCommunityIcons name='close' color={Colors.primary} size={RFPercentage(3.5)} />
+          </TouchableOpacity>
           <Text style={styles.itemDetailsHeading}>Select users to add</Text>
           <ScrollView style={styles.userContainerScroll}>
             <View style={styles.userContainer}>
@@ -193,6 +195,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: RFPercentage(3),
     alignSelf: 'center'
+  },
+
+  modelCross: {
+    position: 'absolute',
+    right: RFPercentage(2),
+    top: RFPercentage(1)
   }
 })
 

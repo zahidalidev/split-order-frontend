@@ -1,18 +1,20 @@
-import { FC, SetStateAction, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Badge } from 'react-native-paper'
 import Constants from 'expo-constants'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
+import { getStoreUser, getToken } from '../utils/getFromStorage'
+import { useToast } from 'react-native-styled-toast'
 import AppBar from '../components/AppBar'
-import { getToken } from '../utils/getFromStorage'
-import { getRestaurantItems } from '../services/restaurant'
-import { Colors } from '../config/theme'
+import { Colors, toastTheme } from '../config/theme'
 import { RootStackParams } from '../components/Routes'
 import Button from '../components/common/Button'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import ItemSelectModal from '../components/itemSelectModal'
+import { addOrder } from '../services/order'
+import LoadingModal from '../components/common/LoadingModal'
 
 interface CurrentItems {
   __v: number
@@ -24,15 +26,35 @@ interface CurrentItems {
   quantity: number
 }
 
+interface TempOrders {
+  itemId: string
+  name: string
+  price: Number
+  quantity: Number
+}
+interface Order {
+  mainUserId: string
+  invitedUsers: [
+    {
+      userId: string
+      orders: TempOrders[]
+    }
+  ]
+}
+
 type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const SelectItems: FC<Props> = (props: Props) => {
   const [currentItems, setCurrentItems] = useState<CurrentItems[]>([])
   const [showSelectItemModal, setShowSelectItemModal] = useState(false)
-  const [restId, setRestId] = useState()
+  const [restId, setRestId] = useState('')
+  const [formId, setFormId] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     setRestId(props.route.params.rest_id)
+    setFormId(props.route.params.from_id)
   }, [])
 
   const handleDecrement = (index: number) => {
@@ -47,6 +69,37 @@ const SelectItems: FC<Props> = (props: Props) => {
     const tempItems = [...currentItems]
     tempItems[index].quantity += 0.5
     setCurrentItems(tempItems)
+  }
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true)
+      const tempOrders: TempOrders[] = []
+      currentItems.forEach(item => {
+        tempOrders.push({
+          itemId: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })
+      })
+
+      const user = await getStoreUser()
+      const body: Order = {
+        mainUserId: formId,
+        invitedUsers: [
+          {
+            userId: user._id,
+            orders: tempOrders
+          }
+        ]
+      }
+      await addOrder(body)
+      toast({ message: 'Order Submited' })
+    } catch (error) {
+      toast({ message: 'Error, Order not submited, Try again', ...toastTheme.error })
+    }
+    setLoading(false)
   }
 
   const ItemComponent = (item: CurrentItems, index: number) => (
@@ -87,6 +140,7 @@ const SelectItems: FC<Props> = (props: Props) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={Colors.primary} />
       <AppBar navigation={props.navigation} title='Name' />
+      <LoadingModal show={loading} />
       <ItemSelectModal
         show={showSelectItemModal}
         restId={restId || ''}
@@ -118,7 +172,6 @@ const SelectItems: FC<Props> = (props: Props) => {
           </View>
         </View>
       </View>
-
       <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
         <View style={styles.itemWrapper}>
           <Text style={styles.itemLabelTitle}>Name</Text>
@@ -128,7 +181,6 @@ const SelectItems: FC<Props> = (props: Props) => {
           </View>
         </View>
       </View>
-
       {currentItems.length !== 0 ? (
         <FlatList
           data={currentItems}
@@ -140,6 +192,15 @@ const SelectItems: FC<Props> = (props: Props) => {
           <Text style={styles.itemNotDesc}>No Item Selected!</Text>
         </View>
       )}
+
+      <View style={styles.orderBtn}>
+        <Button
+          name='Submit'
+          handleSubmit={handleSubmit}
+          backgroundColor={Colors.primary}
+          width='80%'
+        />
+      </View>
     </View>
   )
 }
@@ -246,6 +307,14 @@ const styles = StyleSheet.create({
   itemNotDesc: {
     fontSize: RFPercentage(3),
     color: Colors.grey
+  },
+
+  orderBtn: {
+    position: 'absolute',
+    bottom: RFPercentage(4),
+    alignItems: 'center',
+    left: 0,
+    right: 0
   }
 })
 

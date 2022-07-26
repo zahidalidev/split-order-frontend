@@ -3,6 +3,7 @@ import { Modal, View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'rea
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { useToast } from 'react-native-styled-toast'
 import CheckBox from 'expo-checkbox'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { Colors, toastTheme } from '../config/theme'
 import { getRestaurantItems } from '../services/restaurant'
@@ -74,7 +75,10 @@ const ItemSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectItem
       <LoadingModal show={loading} />
       <View style={styles.backdropModel}>
         <View style={styles.itemContainer}>
-          <Text style={styles.itemDetailsHeading}>Select users to add</Text>
+          <TouchableOpacity onPress={() => setShowItemModal(false)} style={styles.modelCross}>
+            <MaterialCommunityIcons name='close' color={Colors.primary} size={RFPercentage(3.5)} />
+          </TouchableOpacity>
+          <Text style={styles.itemDetailsHeading}>Select items to add</Text>
           <ScrollView style={styles.userContainerScroll}>
             <View style={styles.itemScrollContainer}>
               {items.map((item, index) => (
@@ -189,6 +193,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: RFPercentage(3),
     alignSelf: 'center'
+  },
+
+  modelCross: {
+    position: 'absolute',
+    right: RFPercentage(2),
+    top: RFPercentage(1)
   }
 })
 
