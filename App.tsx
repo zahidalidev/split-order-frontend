@@ -9,7 +9,7 @@ import Routes from './src/components/routes'
 
 const App: FC = () => (
   <ThemeProvider theme={toastTheme}>
-    <ToastProvider maxToasts={3}>
+    <ToastProvider maxToasts={3} offset={10}>
       <Routes />
     </ToastProvider>
   </ThemeProvider>

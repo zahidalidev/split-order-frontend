@@ -1,5 +1,13 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
-import { Modal, View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native'
+import {
+  Modal,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  RefreshControl
+} from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { useToast } from 'react-native-styled-toast'
 import CheckBox from 'expo-checkbox'
@@ -35,10 +43,19 @@ interface User {
 const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUsers }: Props) => {
   const [loading, showLoading] = useState(false)
   const [users, setUsers] = useState<User[]>([])
+  const [refreshing, setRefreshing] = React.useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
     handleAllUsers()
+  }, [])
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true)
+    showLoading(true)
+    await handleAllUsers()
+    setRefreshing(false)
+    showLoading(false)
   }, [])
 
   const handleAllUsers = async () => {
@@ -63,12 +80,18 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
     setShowItemModal(false)
     const tempUsers: SelectedUser[] = []
     users.forEach(item => {
-      if (item.selected) {
+      if (item.selected && item.pushToken) {
         tempUsers.push({
-          pushToken: item.pushToken || ''
+          pushToken: item.pushToken
         })
       }
     })
+    if (tempUsers.length === 0) {
+      toast({
+        message: 'User not selected or selected user should login atleast once',
+        ...toastTheme.error
+      })
+    }
     selectUsers(tempUsers)
   }
 
@@ -81,7 +104,10 @@ const UserSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectUser
             <MaterialCommunityIcons name='close' color={Colors.primary} size={RFPercentage(3.5)} />
           </TouchableOpacity>
           <Text style={styles.itemDetailsHeading}>Select users to add</Text>
-          <ScrollView style={styles.userContainerScroll}>
+          <ScrollView
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            style={styles.userContainerScroll}
+          >
             <View style={styles.userContainer}>
               {users.map((item, index) => (
                 <View key={item._id} style={styles.userCheckContaienr}>
@@ -161,7 +187,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: RFPercentage(2)
   },
 
   userCheckContaienr: {

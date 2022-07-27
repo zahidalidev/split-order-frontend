@@ -310,7 +310,12 @@ const Home: FC<Props> = (props: Props) => {
         <MaterialCommunityIcons name='menu' size={RFPercentage(3)} color={Colors.white} />
       </TouchableOpacity>
       <LoadingModal show={loading} />
-      <ItemModal show={showItemModal} setShowItemModal={setShowItemModal} restId={selectedRestId} />
+      <ItemModal
+        show={showItemModal}
+        setShowItemModal={setShowItemModal}
+        getAllItems={() => getAllItems(selectedRestId)}
+        restId={selectedRestId}
+      />
       <UserSelectModal
         show={showSelectUserModal}
         setShowItemModal={setShowSelectUserModal}

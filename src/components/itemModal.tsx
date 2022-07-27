@@ -13,6 +13,7 @@ interface Props {
   show: boolean
   restId: string
   setShowItemModal: Function
+  getAllItems: Function
 }
 
 interface RestaurantItem {
@@ -21,7 +22,7 @@ interface RestaurantItem {
   restId: string
 }
 
-const ItemModal: FC<Props> = ({ show, restId, setShowItemModal }: Props) => {
+const ItemModal: FC<Props> = ({ show, restId, setShowItemModal, getAllItems }: Props) => {
   const [loading, showLoading] = useState(false)
   const { toast } = useToast()
   const [fields, setFields] = useState([
@@ -56,6 +57,7 @@ const ItemModal: FC<Props> = ({ show, restId, setShowItemModal }: Props) => {
         restId
       }
       await addItem(body, token as string)
+      await getAllItems()
       toast({ message: 'Item Added' })
     } catch (error) {
       console.log(error)
