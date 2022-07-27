@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(3),
     color: Colors.grey,
     alignSelf: 'center',
-    marginTop: RFPercentage(10)
+    marginTop: RFPercentage(5)
   },
 
   orderBtn: {
