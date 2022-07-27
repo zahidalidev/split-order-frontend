@@ -19,8 +19,8 @@ import LoadingModal from '../components/common/LoadingModal'
 interface TempOrders {
   itemId: string
   name: string
-  price: Number
-  quantity: Number
+  price: number
+  quantity: number
 }
 interface UserOrder {
   mainUserId: string
@@ -37,6 +37,7 @@ type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const Order: FC<Props> = (props: Props) => {
   const [currentItems, setCurrentItems] = useState<UserOrder[]>([])
+  const [totalAmount, setTotalAmount] = useState(0)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -45,7 +46,7 @@ const Order: FC<Props> = (props: Props) => {
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
       setCurrentItems(data)
-      console.log('orders: ', data)
+      getTotalCharges(data)
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
     }
@@ -54,6 +55,34 @@ const Order: FC<Props> = (props: Props) => {
   useEffect(() => {
     handleOrders()
   }, [])
+
+  const getTotalCharges = (data: UserOrder[]) => {
+    const totalChargesArr: number[] = []
+    data.forEach(({ invitedUsers }: UserOrder) => {
+      invitedUsers.forEach(user => {
+        totalChargesArr.push(invitedUserBill(user.orders))
+      })
+    })
+    setTotalAmount(totalChargesArr.reduce((acc, curr) => acc + curr, 0))
+  }
+
+  const invitedUserBill = (orders: TempOrders[]) =>
+    orders.reduce(
+      (acc: number, current: TempOrders) => acc + parseInt(current.price * current.quantity),
+      0
+    )
+
+  const OrderHeading = () => (
+    <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
+      <View style={styles.itemWrapper}>
+        <Text style={styles.itemLabelTitle}>Name</Text>
+        <Text style={styles.itemLabelTitle}>Price</Text>
+        <View style={styles.quantityWrapper}>
+          <Text style={styles.itemLabelTitle}>Quantity</Text>
+        </View>
+      </View>
+    </View>
+  )
 
   const orderComponent = (item: TempOrders) => (
     <View key={item.itemId} style={styles.itemWrapper}>
@@ -70,16 +99,13 @@ const Order: FC<Props> = (props: Props) => {
   const itemComponent = ({ invitedUsers }: UserOrder) =>
     invitedUsers.map((user, index) => (
       <View key={index.toString()} style={styles.itemContainer}>
-        <Text style={styles.orerUserName}>Order of {user.userName}</Text>
-        <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
-          <View style={styles.itemWrapper}>
-            <Text style={styles.itemLabelTitle}>Name</Text>
-            <Text style={styles.itemLabelTitle}>Price</Text>
-            <View style={styles.quantityWrapper}>
-              <Text style={styles.itemLabelTitle}>Quantity</Text>
-            </View>
-          </View>
+        <View style={styles.userOrderSummaryHeading}>
+          <Text style={styles.orerUserSummary}>Order of {user.userName}</Text>
+          <Text style={styles.orerUserSummary}>
+            Total amount ({invitedUserBill(user.orders)} PKR)
+          </Text>
         </View>
+        <OrderHeading />
         {user.orders.map(item => orderComponent(item))}
       </View>
     ))
@@ -100,6 +126,10 @@ const Order: FC<Props> = (props: Props) => {
       </View>
 
       <View style={styles.orderBtn}>
+        <View style={styles.totalAmountWrapper}>
+          <Text style={styles.totalAmount}>Total amount</Text>
+          <Text style={[styles.totalAmount, styles.totalAmountPkr]}>{totalAmount} PKR</Text>
+        </View>
         <Button
           name='Clear'
           // handleSubmit={handleSubmit}
@@ -128,7 +158,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     width: '100%',
     alignItems: 'center',
-    marginTop: RFPercentage(1.5)
+    marginTop: RFPercentage(0.5)
   },
 
   itemHeadingContainer: {
@@ -191,16 +221,39 @@ const styles = StyleSheet.create({
     right: 0
   },
 
-  orerUserName: {
+  orerUserSummary: {
     fontSize: RFPercentage(2.3),
     fontWeight: '500',
     alignSelf: 'flex-start',
     marginLeft: '5%',
-    marginTop: RFPercentage(2)
+    marginTop: RFPercentage(3),
+    color: Colors.primary
   },
 
   orderContainer: {
     marginTop: RFPercentage(2)
+  },
+
+  userOrderSummaryHeading: {
+    width: '90%',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+
+  totalAmountWrapper: {
+    flexDirection: 'row',
+    width: '80%',
+    alignItems: 'flex-start'
+  },
+
+  totalAmount: {
+    fontSize: RFPercentage(2.2),
+    marginBottom: RFPercentage(2)
+  },
+
+  totalAmountPkr: {
+    marginLeft: 5,
+    fontWeight: '500'
   }
 })
 
