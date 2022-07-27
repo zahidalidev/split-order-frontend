@@ -6,25 +6,21 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Badge } from 'react-native-paper'
 import Constants from 'expo-constants'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 
-import { getStoreUser, getToken } from '../utils/getFromStorage'
+import { getStoreUser } from '../utils/getFromStorage'
 import { useToast } from 'react-native-styled-toast'
 import AppBar from '../components/appBar'
 import { Colors, toastTheme } from '../config/theme'
 import { RootStackParams } from '../components/routes'
 import Button from '../components/common/Button'
 import { RFPercentage } from 'react-native-responsive-fontsize'
-import ItemSelectModal from '../components/itemSelectModal'
-import { addOrder, getOrders } from '../services/order'
+import { getOrders } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
-import { getTotalCharges, invitedUserBill } from '../utils/constants'
+import { getDataWithTotalCharges } from '../utils/constants'
 
 interface TempOrders {
   itemId: string
@@ -38,6 +34,7 @@ interface UserOrder {
     {
       userId: string
       userName: string
+      userCharges: number
       orders: TempOrders[]
     }
   ]
@@ -67,8 +64,10 @@ const Order: FC<Props> = (props: Props) => {
       setLoading(true)
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
-      setCurrentItems(data)
-      setTotalAmount(getTotalCharges(data))
+      console.log('data: ', data)
+      const { dataWithCharges, totalCharges } = getDataWithTotalCharges(data)
+      setCurrentItems(dataWithCharges)
+      setTotalAmount(totalCharges)
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
     }
@@ -106,9 +105,7 @@ const Order: FC<Props> = (props: Props) => {
       <View key={index.toString()} style={styles.itemContainer}>
         <View style={styles.userOrderSummaryHeading}>
           <Text style={styles.orerUserSummary}>Order of {user.userName}</Text>
-          <Text style={styles.orerUserSummary}>
-            Total amount ({invitedUserBill(user.orders)} PKR)
-          </Text>
+          <Text style={styles.orerUserSummary}>Total amount ({user.userCharges} PKR)</Text>
         </View>
         <OrderHeading />
         {user.orders.map(item => orderComponent(item))}

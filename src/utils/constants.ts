@@ -126,22 +126,28 @@ interface UserOrder {
     {
       userId: string
       userName: string
+      userCharges: number
       orders: TempOrders[]
     }
   ]
 }
 
-export const getTotalCharges = (data: UserOrder[]) => {
+export const getDataWithTotalCharges = (data: UserOrder[]) => {
+  const tempData = [...data]
   const totalChargesArr: number[] = []
-  data.forEach(({ invitedUsers }: UserOrder) => {
+  tempData.forEach(({ invitedUsers }: UserOrder) => {
     invitedUsers.forEach(user => {
       totalChargesArr.push(invitedUserBill(user.orders))
+      user.userCharges = invitedUserBill(user.orders)
     })
   })
-  return totalChargesArr.reduce((acc, curr) => acc + curr, 0)
+  return {
+    dataWithCharges: tempData,
+    totalCharges: totalChargesArr.reduce((acc, curr) => acc + curr, 0)
+  }
 }
 
-export const invitedUserBill = (orders: TempOrders[]) =>
+const invitedUserBill = (orders: TempOrders[]) =>
   orders.reduce(
     (acc: number, current: TempOrders) => acc + parseInt(current.price * current.quantity),
     0
