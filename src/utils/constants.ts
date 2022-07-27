@@ -113,3 +113,36 @@ export const drawerRoutes: AllRoute[] = [
     icon: 'food'
   }
 ]
+
+interface TempOrders {
+  itemId: string
+  name: string
+  price: number
+  quantity: number
+}
+interface UserOrder {
+  mainUserId: string
+  invitedUsers: [
+    {
+      userId: string
+      userName: string
+      orders: TempOrders[]
+    }
+  ]
+}
+
+export const getTotalCharges = (data: UserOrder[]) => {
+  const totalChargesArr: number[] = []
+  data.forEach(({ invitedUsers }: UserOrder) => {
+    invitedUsers.forEach(user => {
+      totalChargesArr.push(invitedUserBill(user.orders))
+    })
+  })
+  return totalChargesArr.reduce((acc, curr) => acc + curr, 0)
+}
+
+export const invitedUserBill = (orders: TempOrders[]) =>
+  orders.reduce(
+    (acc: number, current: TempOrders) => acc + parseInt(current.price * current.quantity),
+    0
+  )

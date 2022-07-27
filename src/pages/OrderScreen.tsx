@@ -15,6 +15,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import ItemSelectModal from '../components/itemSelectModal'
 import { addOrder, getOrders } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
+import { getTotalCharges, invitedUserBill } from '../utils/constants'
 
 interface TempOrders {
   itemId: string
@@ -41,36 +42,22 @@ const Order: FC<Props> = (props: Props) => {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
+  useEffect(() => {
+    handleOrders()
+  }, [])
+
   const handleOrders = async () => {
     try {
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
       setCurrentItems(data)
-      getTotalCharges(data)
+      setTotalAmount(getTotalCharges(data))
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
     }
   }
 
-  useEffect(() => {
-    handleOrders()
-  }, [])
-
-  const getTotalCharges = (data: UserOrder[]) => {
-    const totalChargesArr: number[] = []
-    data.forEach(({ invitedUsers }: UserOrder) => {
-      invitedUsers.forEach(user => {
-        totalChargesArr.push(invitedUserBill(user.orders))
-      })
-    })
-    setTotalAmount(totalChargesArr.reduce((acc, curr) => acc + curr, 0))
-  }
-
-  const invitedUserBill = (orders: TempOrders[]) =>
-    orders.reduce(
-      (acc: number, current: TempOrders) => acc + parseInt(current.price * current.quantity),
-      0
-    )
+  const handleSubmit = () => {}
 
   const OrderHeading = () => (
     <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
@@ -131,8 +118,8 @@ const Order: FC<Props> = (props: Props) => {
           <Text style={[styles.totalAmount, styles.totalAmountPkr]}>{totalAmount} PKR</Text>
         </View>
         <Button
-          name='Clear'
-          // handleSubmit={handleSubmit}
+          name='Clear & Send Email'
+          handleSubmit={handleSubmit}
           backgroundColor={Colors.primary}
           width='80%'
         />
@@ -174,12 +161,6 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.lightGrey,
     borderBottomWidth: 0.5,
     padding: RFPercentage(2)
-  },
-
-  itemQuantity: {
-    width: RFPercentage(2.5),
-    justifyContent: 'center',
-    alignItems: 'center'
   },
 
   quantity: {
