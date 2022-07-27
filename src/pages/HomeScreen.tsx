@@ -219,7 +219,12 @@ const Home: FC<Props> = (props: Props) => {
         formik={false}
       />
       <View style={styles.addResBtn}>
-        <Button handleSubmit={handleRestaurant} name='Add Restaurant' />
+        <Button
+          handleSubmit={handleRestaurant}
+          backgroundColor={Colors.primary}
+          width='60%'
+          name='Add Restaurant'
+        />
       </View>
     </View>
   )
@@ -350,7 +355,8 @@ const styles = StyleSheet.create({
     elevation: 2,
     backgroundColor: Colors.white,
     margin: 10,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: RFPercentage(3)
   },
 
   barsWrapper: {
@@ -378,11 +384,16 @@ const styles = StyleSheet.create({
 
   restContainer: {
     width: '90%',
-    marginTop: RFPercentage(2)
+    marginTop: RFPercentage(2),
+    flex: 1
   },
 
   addResBtn: {
-    marginTop: RFPercentage(4)
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: RFPercentage(4),
+    left: 0,
+    right: 0
   },
 
   restItemsComponent: {
