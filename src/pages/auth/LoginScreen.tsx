@@ -1,5 +1,13 @@
 import { FC, useEffect, useState } from 'react'
-import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { Formik } from 'formik'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -98,6 +106,15 @@ const Login: FC<Props> = ({ navigation }: Props) => {
                       handleChange={handleChange}
                     />
                   ))}
+
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => navigation.navigate('Register', { name: '' })}
+                    style={styles.account}
+                  >
+                    <Text style={styles.accountDescLogin}>Create Account</Text>
+                    <Text style={styles.accountDesc}>Don't have an account? </Text>
+                  </TouchableOpacity>
                   <View style={styles.buttonWrapper}>
                     <Button handleSubmit={handleSubmit} name='Login' width='75%' />
                   </View>
@@ -161,6 +178,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: RFPercentage(5),
     marginBottom: RFPercentage(2)
+  },
+
+  account: {
+    flexDirection: 'row-reverse',
+    marginTop: RFPercentage(1.5)
+  },
+
+  accountDesc: {
+    fontSize: RFPercentage(1.8)
+  },
+
+  accountDescLogin: {
+    color: Colors.primary,
+    fontSize: RFPercentage(2),
+    fontWeight: 'bold',
+    marginLeft: 2
   }
 })
 

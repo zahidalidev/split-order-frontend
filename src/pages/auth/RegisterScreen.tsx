@@ -24,6 +24,7 @@ import { Colors } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 import { RootStackParams } from '../../components/routes'
 import { registerFields } from '../../utils/constants'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
 
@@ -85,6 +86,14 @@ const Register: FC<Props> = ({ navigation }: Props) => {
                       handleChange={handleChange}
                     />
                   ))}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => navigation.navigate('Login', { name: '' })}
+                    style={styles.account}
+                  >
+                    <Text style={styles.accountDescLogin}>login</Text>
+                    <Text style={styles.accountDesc}>Already have an account? </Text>
+                  </TouchableOpacity>
                   <View style={styles.buttonWrapper}>
                     <Button handleSubmit={handleSubmit} name='Register' width='75%' />
                   </View>
@@ -149,6 +158,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: RFPercentage(4),
     marginBottom: RFPercentage(2)
+  },
+
+  account: {
+    flexDirection: 'row-reverse',
+    marginTop: RFPercentage(1.5)
+  },
+
+  accountDesc: {
+    fontSize: RFPercentage(1.8)
+  },
+
+  accountDescLogin: {
+    color: Colors.primary,
+    fontSize: RFPercentage(2),
+    fontWeight: 'bold',
+    marginLeft: 2
   }
 })
 
