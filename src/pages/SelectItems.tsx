@@ -38,6 +38,7 @@ interface Order {
     {
       userId: string
       userName: string
+      userEmail: string
       orders: TempOrders[]
     }
   ]
@@ -92,6 +93,7 @@ const SelectItems: FC<Props> = (props: Props) => {
           {
             userId: user._id,
             userName: user.fullName,
+            userEmail: user.email,
             orders: tempOrders
           }
         ]

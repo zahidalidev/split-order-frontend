@@ -126,6 +126,7 @@ interface UserOrder {
     {
       userId: string
       userName: string
+      userEmail: string
       userCharges: number
       orders: TempOrders[]
     }

@@ -35,6 +35,7 @@ interface UserOrder {
       userId: string
       userName: string
       userCharges: number
+      userEmail: string
       orders: TempOrders[]
     }
   ]
@@ -74,7 +75,10 @@ const Order: FC<Props> = (props: Props) => {
     setLoading(false)
   }
 
-  const handleSubmit = () => {}
+  const handleSubmit = () => {
+    try {
+    } catch (error) {}
+  }
 
   const OrderHeading = () => (
     <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
