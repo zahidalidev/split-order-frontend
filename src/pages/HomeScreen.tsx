@@ -210,6 +210,17 @@ const Home: FC<Props> = (props: Props) => {
     props.navigation.dispatch(DrawerActions.toggleDrawer())
   }
 
+  const handleCurrentRestItems = async (restId: string) => {
+    setLoading(true)
+    try {
+      setRestId(restId)
+      await getAllItems(restId)
+    } catch (error) {
+      toast({ message: 'Getting Restaurant Items Error!', ...toastTheme.error })
+    }
+    setLoading(false)
+  }
+
   const addRestaurantComponent = (
     <View style={styles.restContainer}>
       <Input
@@ -236,7 +247,7 @@ const Home: FC<Props> = (props: Props) => {
         mode='dropdown'
         placeholder='Select Restaurant'
         selectedValue={selectedRestId}
-        onValueChange={(itemValue, itemIndex) => setRestId(itemValue)}
+        onValueChange={restId => handleCurrentRestItems(restId)}
       >
         {restPickItems.map(item => (
           <Picker.Item key={item.label} label={item.label} value={item.value} />

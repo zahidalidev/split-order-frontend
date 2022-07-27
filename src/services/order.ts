@@ -5,6 +5,8 @@ const orderEndpoint = `${nodeApi}/order`
 
 export const addOrder = async (body: Order) => await axios.post(orderEndpoint, body)
 
+export const getOrders = async (id: string) => await axios.get(`${orderEndpoint}/${id}`)
+
 interface Order {
   mainUserId: string
   invitedUsers: [

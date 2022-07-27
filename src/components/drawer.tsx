@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RFPercentage } from 'react-native-responsive-fontsize'
@@ -10,6 +10,7 @@ import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons'
 import { drawerRoutes, Token, User } from '../utils/constants'
 import { RootStackParams } from './routes'
 import { toastTheme } from '../config/theme'
+import headerImg from '../../assets/header.jpg'
 
 type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
@@ -27,37 +28,44 @@ const Drawer: FC<Props> = (props: Props) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.routeBtnWrapper}>
-        <FlatList
-          data={drawerRoutes}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate(item.name, { name: '' })}
-              activeOpacity={0.7}
-              style={styles.routeBtn}
-            >
-              <MaterialCommunityIcons name={item.icon} size={RFPercentage(3)} />
-              <Text style={styles.routeName}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
-        />
+    <>
+      <Image style={styles.headerImg} source={headerImg} />
+      <View style={styles.container}>
+        <View style={styles.routeBtnWrapper}>
+          <FlatList
+            data={drawerRoutes}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => props.navigation.navigate(item.name, { name: '' })}
+                activeOpacity={0.7}
+                style={styles.routeBtn}
+              >
+                <MaterialCommunityIcons name={item.icon} size={RFPercentage(3)} />
+                <Text style={styles.routeName}>{item.title}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+        <View style={[styles.routeBtnWrapper, styles.logout]}>
+          <TouchableOpacity style={styles.routeBtn} activeOpacity={0.7} onPress={handleLogout}>
+            <AntDesign name='logout' size={RFPercentage(3)} />
+            <Text style={styles.routeName}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={[styles.routeBtnWrapper, styles.logout]}>
-        <TouchableOpacity style={styles.routeBtn} activeOpacity={0.7} onPress={handleLogout}>
-          <AntDesign name='logout' size={RFPercentage(3)} />
-          <Text style={styles.routeName}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight
+    flex: 1
+  },
+
+  headerImg: {
+    width: '100%',
+    height: RFPercentage(25)
   },
 
   routeBtnWrapper: {
