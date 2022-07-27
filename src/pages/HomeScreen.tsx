@@ -3,7 +3,6 @@ import {
   Alert,
   FlatList,
   ImageBackground,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -26,12 +25,12 @@ import LoadingModal from '../components/common/LoadingModal'
 import { getStoreUser, getToken } from '../utils/getFromStorage'
 import ItemModal from '../components/itemModal'
 import UserSelectModal from '../components/userSelectModal'
+import { RootStackParams } from '../components/routes'
+import { SentNotification } from '../utils/SendNotification'
 
 import { Colors, toastTheme } from '../config/theme'
 import headerImg from '../../assets/header.jpg'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { RootStackParams } from '../components/Routes'
-import { SentNotification } from '../utils/SendNotification'
+import { DrawerActions } from '@react-navigation/native'
 
 interface RestItems {
   __v: number
@@ -77,7 +76,7 @@ Notifications.setNotificationHandler({
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
 
-const Home: FC<Props> = ({ navigation }: Props) => {
+const Home: FC<Props> = (props: Props) => {
   const [selectedRestId, setRestId] = useState('')
   const [currentBar, setCurrentBar] = useState('rest')
   const [restName, setRestName] = useState('')
@@ -107,7 +106,7 @@ const Home: FC<Props> = ({ navigation }: Props) => {
       const { from_id, rest_id } = response.notification.request.content.data
 
       if (from_id) {
-        navigation.navigate('SelectItems', { from_id, rest_id })
+        props.navigation.navigate('SelectItems', { from_id, rest_id })
       }
     })
 
@@ -207,14 +206,8 @@ const Home: FC<Props> = ({ navigation }: Props) => {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem(Token)
-      await AsyncStorage.removeItem(User)
-      navigation.navigate('Login', { name: '' })
-    } catch (error) {
-      toast({ message: 'Logout Error!', ...toastTheme.error })
-    }
+  const handleDrawer = () => {
+    props.navigation.dispatch(DrawerActions.toggleDrawer())
   }
 
   const addRestaurantComponent = (
@@ -294,11 +287,11 @@ const Home: FC<Props> = ({ navigation }: Props) => {
 
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={{ position: 'absolute', left: RFPercentage(3), top: RFPercentage(5), zIndex: 2 }}
-      >
-        <MaterialCommunityIcons name='exit-to-app' size={RFPercentage(3)} color={Colors.white} />
+      <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
+        <StatusBar backgroundColor='transparent' translucent={true} />
+      </ImageBackground>
+      <TouchableOpacity onPress={handleDrawer} style={styles.menuIcon}>
+        <MaterialCommunityIcons name='menu' size={RFPercentage(3)} color={Colors.white} />
       </TouchableOpacity>
       <LoadingModal show={loading} />
       <ItemModal show={showItemModal} setShowItemModal={setShowItemModal} restId={selectedRestId} />
@@ -308,9 +301,6 @@ const Home: FC<Props> = ({ navigation }: Props) => {
         restId={selectedRestId}
         selectUsers={setSelectedUsers}
       />
-      <ImageBackground resizeMode='stretch' style={styles.imgContainer} source={headerImg}>
-        <StatusBar backgroundColor='transparent' translucent={true} />
-      </ImageBackground>
       <View style={styles.bottomContainer}>
         <View style={styles.barsWrapper}>
           {homeBars.map(item => (
@@ -463,7 +453,9 @@ const styles = StyleSheet.create({
 
   headingIconContainer: {
     flexDirection: 'row'
-  }
+  },
+
+  menuIcon: { position: 'absolute', left: RFPercentage(2), top: RFPercentage(5.5) }
 })
 
 export default Home

@@ -1,11 +1,13 @@
 import { FC } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 
 import RegisterScreen from '../pages/auth/RegisterScreen'
 import LoginScreen from '../pages/auth/LoginScreen'
 import HomeScreen from '../pages/HomeScreen'
 import SelectItems from '../pages/SelectItems'
+import Drawer from './drawer'
+import Order from '../pages/OrderScreen'
 
 export type RootStackParams = {
   Register: {
@@ -20,9 +22,12 @@ export type RootStackParams = {
   SelectItems: {
     name: string
   }
+  Order: {
+    name: string
+  }
 }
 
-const RootStack = createNativeStackNavigator<RootStackParams>()
+const RootStack = createDrawerNavigator<RootStackParams>()
 
 const Routes: FC = () => {
   const allRoutes = [
@@ -41,12 +46,20 @@ const Routes: FC = () => {
     {
       name: 'SelectItems',
       component: SelectItems
+    },
+    {
+      name: 'Order',
+      component: Order
     }
   ]
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login'>
+      <RootStack.Navigator
+        screenOptions={{ headerShown: false }}
+        drawerContent={(props: any) => <Drawer {...props} />}
+        initialRouteName='Login'
+      >
         {allRoutes.map((item, index) => (
           <RootStack.Screen
             key={index.toString()}

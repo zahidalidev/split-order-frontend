@@ -12,7 +12,7 @@ import { loginValidationSchema } from '../../utils/authValidate'
 import LoadingModal from '../../components/common/LoadingModal'
 import { getCurrentUser, loginUser } from '../../services/user'
 import { loginFields, Token, User } from '../../utils/constants'
-import { RootStackParams } from '../../components/Routes'
+import { RootStackParams } from '../../components/routes'
 import { getPushNotificationsToken } from '../../components/common/Notification'
 
 import { Colors, toastTheme } from '../../config/theme'

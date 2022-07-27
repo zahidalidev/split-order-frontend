@@ -1,10 +1,11 @@
 import { FC } from 'react'
+import React from 'react'
 import { ThemeProvider } from 'styled-components'
 import { ToastProvider } from 'react-native-styled-toast'
-import React from 'react'
+import 'react-native-gesture-handler'
 
 import { toastTheme } from './src/config/theme'
-import Routes from './src/components/Routes'
+import Routes from './src/components/routes'
 
 const App: FC = () => (
   <ThemeProvider theme={toastTheme}>

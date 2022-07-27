@@ -1,4 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
+import { RootStackParams } from '../components/routes'
 
 interface ListProps {
   id: number
@@ -82,5 +83,33 @@ export const homeBars = [
     id: 1,
     name: 'rest',
     title: 'Add Restaurant'
+  }
+]
+
+interface AllRoute {
+  id: number
+  name: keyof RootStackParams
+  title: string
+  icon: any
+}
+
+export const drawerRoutes: AllRoute[] = [
+  {
+    id: 0,
+    name: 'Home',
+    title: 'Home',
+    icon: 'home'
+  },
+  {
+    id: 1,
+    name: 'SelectItems',
+    title: 'Select Items',
+    icon: 'food-variant'
+  },
+  {
+    id: 3,
+    name: 'Order',
+    title: 'Order',
+    icon: 'food'
   }
 ]
