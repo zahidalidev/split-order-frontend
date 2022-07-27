@@ -1,5 +1,14 @@
-import { FC, useEffect, useState } from 'react'
-import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FC, useCallback, useEffect, useState } from 'react'
+import {
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Badge } from 'react-native-paper'
 import Constants from 'expo-constants'
@@ -40,14 +49,22 @@ const Order: FC<Props> = (props: Props) => {
   const [currentItems, setCurrentItems] = useState<UserOrder[]>([])
   const [totalAmount, setTotalAmount] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
     handleOrders()
   }, [])
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await handleOrders()
+    setRefreshing(false)
+  }, [])
+
   const handleOrders = async () => {
     try {
+      setLoading(true)
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
       setCurrentItems(data)
@@ -55,6 +72,7 @@ const Order: FC<Props> = (props: Props) => {
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
     }
+    setLoading(false)
   }
 
   const handleSubmit = () => {}
@@ -104,11 +122,18 @@ const Order: FC<Props> = (props: Props) => {
       <LoadingModal show={loading} />
       <View style={styles.orderContainer}>
         {currentItems.length !== 0 ? (
-          <FlatList data={currentItems} renderItem={({ item }) => itemComponent(item)} />
+          <FlatList
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            data={currentItems}
+            renderItem={({ item }) => itemComponent(item)}
+          />
         ) : (
-          <View style={styles.itemNot}>
+          <ScrollView
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            style={styles.itemNot}
+          >
             <Text style={styles.itemNotDesc}>No Orders yet!</Text>
-          </View>
+          </ScrollView>
         )}
       </View>
 
@@ -183,15 +208,15 @@ const styles = StyleSheet.create({
   },
 
   itemNot: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: RFPercentage(5)
+    height: '100%',
+    width: '100%'
   },
 
   itemNotDesc: {
     fontSize: RFPercentage(3),
-    color: Colors.grey
+    color: Colors.grey,
+    alignSelf: 'center',
+    marginTop: RFPercentage(10)
   },
 
   orderBtn: {
