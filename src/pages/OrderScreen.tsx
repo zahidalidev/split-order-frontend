@@ -16,27 +16,18 @@ import ItemSelectModal from '../components/itemSelectModal'
 import { addOrder, getOrders } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
 
-interface CurrentItems {
-  __v: number
-  _id: string
-  name: string
-  price: number
-  restId: string
-  selected: boolean
-  quantity: number
-}
-
 interface TempOrders {
   itemId: string
   name: string
   price: Number
   quantity: Number
 }
-interface Order {
+interface UserOrder {
   mainUserId: string
   invitedUsers: [
     {
       userId: string
+      userName: string
       orders: TempOrders[]
     }
   ]
@@ -45,10 +36,7 @@ interface Order {
 type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const Order: FC<Props> = (props: Props) => {
-  const [currentItems, setCurrentItems] = useState<CurrentItems[]>([])
-  const [showSelectItemModal, setShowSelectItemModal] = useState(false)
-  const [restId, setRestId] = useState('')
-  const [formId, setFormId] = useState('')
+  const [currentItems, setCurrentItems] = useState<UserOrder[]>([])
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -56,6 +44,7 @@ const Order: FC<Props> = (props: Props) => {
     try {
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
+      setCurrentItems(data)
       console.log('orders: ', data)
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
@@ -66,65 +55,49 @@ const Order: FC<Props> = (props: Props) => {
     handleOrders()
   }, [])
 
-  const ItemComponent = (item: CurrentItems, index: number) => (
-    <View style={styles.itemContainer}>
-      <View style={styles.itemWrapper}>
-        <Text style={styles.itemLabel}>{item.name}</Text>
-        <Text style={styles.itemLabel}>{item.price} pkr</Text>
-        <View style={styles.quantityWrapper}>
-          <Button
-            name='-'
-            disable={item.quantity === 0}
-            // handleSubmit={() => handleDecrement(index)}
-            fontSize={RFPercentage(3.3)}
-            width={RFPercentage(4)}
-            height={RFPercentage(4)}
-            backgroundColor={Colors.danger}
-          />
-          <View style={styles.itemQuantity}>
-            <Text
-              style={[styles.quantity, { color: item.quantity ? Colors.black : Colors.danger }]}
-            >
-              {item.quantity}
-            </Text>
-          </View>
-          <Button
-            name='+'
-            // handleSubmit={() => handleIncrement(index)}
-            width={RFPercentage(4)}
-            height={RFPercentage(4)}
-            backgroundColor={Colors.primary}
-          />
-        </View>
+  const orderComponent = (item: TempOrders) => (
+    <View key={item.itemId} style={styles.itemWrapper}>
+      <Text style={styles.itemLabel}>{item.name}</Text>
+      <Text style={styles.itemLabel}>{item.price} pkr</Text>
+      <View style={styles.quantityWrapper}>
+        <Text style={[styles.quantity, { color: item.quantity ? Colors.black : Colors.danger }]}>
+          {item.quantity}
+        </Text>
       </View>
     </View>
   )
 
+  const itemComponent = ({ invitedUsers }: UserOrder) =>
+    invitedUsers.map((user, index) => (
+      <View key={index.toString()} style={styles.itemContainer}>
+        <Text style={styles.orerUserName}>Order of {user.userName}</Text>
+        <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
+          <View style={styles.itemWrapper}>
+            <Text style={styles.itemLabelTitle}>Name</Text>
+            <Text style={styles.itemLabelTitle}>Price</Text>
+            <View style={styles.quantityWrapper}>
+              <Text style={styles.itemLabelTitle}>Quantity</Text>
+            </View>
+          </View>
+        </View>
+        {user.orders.map(item => orderComponent(item))}
+      </View>
+    ))
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={Colors.primary} />
-      <AppBar navigation={props.navigation} title='Name' />
+      <AppBar navigation={props.navigation} title='All Orders' />
       <LoadingModal show={loading} />
-      <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
-        <View style={styles.itemWrapper}>
-          <Text style={styles.itemLabelTitle}>Name</Text>
-          <Text style={styles.itemLabelTitle}>Price</Text>
-          <View style={styles.quantityWrapper}>
-            <Text style={styles.itemLabelTitle}>Quantity</Text>
+      <View style={styles.orderContainer}>
+        {currentItems.length !== 0 ? (
+          <FlatList data={currentItems} renderItem={({ item }) => itemComponent(item)} />
+        ) : (
+          <View style={styles.itemNot}>
+            <Text style={styles.itemNotDesc}>No Orders yet!</Text>
           </View>
-        </View>
+        )}
       </View>
-      {currentItems.length !== 0 ? (
-        <FlatList
-          data={currentItems}
-          keyExtractor={item => item._id}
-          renderItem={({ item, index }) => ItemComponent(item, index)}
-        />
-      ) : (
-        <View style={styles.itemNot}>
-          <Text style={styles.itemNotDesc}>No Item Selected!</Text>
-        </View>
-      )}
 
       <View style={styles.orderBtn}>
         <Button
@@ -164,7 +137,7 @@ const styles = StyleSheet.create({
   },
 
   itemWrapper: {
-    width: '90%',
+    width: '85%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -216,6 +189,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     left: 0,
     right: 0
+  },
+
+  orerUserName: {
+    fontSize: RFPercentage(2.3),
+    fontWeight: '500',
+    alignSelf: 'flex-start',
+    marginLeft: '5%',
+    marginTop: RFPercentage(2)
+  },
+
+  orderContainer: {
+    marginTop: RFPercentage(2)
   }
 })
 
