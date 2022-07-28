@@ -20,11 +20,12 @@ import { addUser } from '../../services/user'
 import LoadingModal from '../../components/common/LoadingModal'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-import { Colors } from '../../config/theme'
+import { Colors, toastTheme } from '../../config/theme'
 import logo from '../../../assets/logo.png'
 import { RootStackParams } from '../../components/routes'
 import { registerFields } from '../../utils/constants'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { useToast } from 'react-native-styled-toast'
 
 type Props = NativeStackScreenProps<RootStackParams, 'Login'>
 
@@ -39,15 +40,22 @@ interface ValuesOb {
 
 const Register: FC<Props> = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
 
   const registerUser = async (values: ValuesOb) => {
     try {
       setLoading(true)
       const { data } = await addUser(values)
       console.log(data)
+      toast({
+        message: 'Registration Successful!'
+      })
       navigation.navigate('Login', { name: '' })
     } catch (error) {
-      console.log(error)
+      toast({
+        message: 'Registration Error!',
+        ...toastTheme.error
+      })
     }
     setLoading(false)
   }

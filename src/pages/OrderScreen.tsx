@@ -23,6 +23,7 @@ import Button from '../components/common/Button'
 import { clearAndSendOrder, getOrders } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
 import { getDataWithTotalCharges } from '../utils/constants'
+import { removeOrderById } from '../services/order'
 
 interface TempOrders {
   itemId: string
@@ -49,7 +50,7 @@ type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 const Order: FC<Props> = (props: Props) => {
   const [currentItems, setCurrentItems] = useState<UserOrder[]>([])
   const [totalAmount, setTotalAmount] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, showLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const { toast } = useToast()
 
@@ -65,7 +66,7 @@ const Order: FC<Props> = (props: Props) => {
 
   const handleOrders = async () => {
     try {
-      setLoading(true)
+      showLoading(true)
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
       const { dataWithCharges, totalCharges } = getDataWithTotalCharges(data)
@@ -74,20 +75,42 @@ const Order: FC<Props> = (props: Props) => {
     } catch (error) {
       toast({ message: 'Getting order error!', ...toastTheme.error })
     }
-    setLoading(false)
+    showLoading(false)
   }
 
   const handleSubmit = async () => {
     try {
+      showLoading(true)
       const token = await getToken()
-      const { data } = await clearAndSendOrder(currentItems, token)
-    } catch (error) {}
+      await clearAndSendOrder(currentItems, token || '')
+      currentItems.forEach(async item => {
+        await handleRemoveCard(item._id, false)
+      })
+      setCurrentItems([])
+      toast({ message: 'Emails Sent!' })
+    } catch (error) {
+      toast({ message: 'Failed to send email!', ...toastTheme.error })
+    }
+    showLoading(false)
   }
 
-  const handleRemoveCard = (_id: string) => {
+  const handleRemoveCard = async (_id: string, alert: boolean = true) => {
+    showLoading(true)
+    let oldItemsTemp = [...currentItems]
     let currentItemsTemp = [...currentItems]
     currentItemsTemp = currentItemsTemp.filter(item => item._id !== _id)
     setCurrentItems(currentItemsTemp)
+    try {
+      const token = await getToken()
+      await removeOrderById(_id, token || '')
+      if (alert) {
+        toast({ message: 'Order removed!' })
+      }
+    } catch (error) {
+      toast({ message: 'Failed to remove order!', ...toastTheme.error })
+      setCurrentItems(oldItemsTemp)
+    }
+    showLoading(false)
   }
 
   const OrderHeading = () => (

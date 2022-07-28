@@ -46,9 +46,11 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       const { data } = await loginUser(tempValues)
       AsyncStorage.setItem(Token, JSON.stringify(data))
       await getUser()
+      toast({
+        message: 'Login Successful!'
+      })
       navigation.navigate('Home', { name: '' })
     } catch (error) {
-      console.log(error)
       toast({
         message: 'Login Error!',
         ...toastTheme.error
@@ -65,7 +67,6 @@ const Login: FC<Props> = ({ navigation }: Props) => {
       navigation.navigate('Home', { name: '' })
     } catch (error: any) {
       console.log('Login error: ', error.message)
-      // navigation.navigate('Login', { name: '' })
     }
     setLogin(true)
   }

@@ -15,11 +15,7 @@ const AppBar: FC<Props> = ({ navigation, title }: Props) => (
   <Appbar style={styles.bottom}>
     <Appbar.Action icon='chevron-left' onPress={() => navigation.navigate('Home')} />
     <View style={styles.barContentContainer}>
-      <Appbar.Content
-        title={title}
-        style={styles.barHeading}
-        onPress={() => console.log('Pressed delete')}
-      />
+      <Appbar.Content title={title} style={styles.barHeading} />
     </View>
   </Appbar>
 )

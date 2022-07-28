@@ -60,7 +60,6 @@ const ItemModal: FC<Props> = ({ show, restId, setShowItemModal, getAllItems }: P
       await getAllItems()
       toast({ message: 'Item Added' })
     } catch (error) {
-      console.log(error)
       toast({
         message: 'Error while adding item!',
         ...toastTheme.error

@@ -166,7 +166,6 @@ const Home: FC<Props> = (props: Props) => {
       await addRestaurant(restName, token || '')
       toast({ message: 'Restaurant Added' })
     } catch (error: any) {
-      console.log('error: ', error.message)
       toast({
         message: 'Error while adding restaurant!',
         ...toastTheme.error

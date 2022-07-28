@@ -7,7 +7,7 @@ export const addOrder = async (body: Order) => await axios.post(orderEndpoint, b
 
 export const getOrders = async (id: string) => await axios.get(`${orderEndpoint}/${id}`)
 
-export const clearAndSendOrder = async (body: Order[], token: string | null) =>
+export const clearAndSendOrder = async (body: Order[], token: string) =>
   await axios.post(
     `${orderEndpoint}/email`,
     { orders: body },
@@ -17,6 +17,13 @@ export const clearAndSendOrder = async (body: Order[], token: string | null) =>
       }
     }
   )
+
+export const removeOrderById = async (id: string, token: string) =>
+  await axios.delete(`${orderEndpoint}/${id}`, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
 
 interface TempOrders {
   itemId: string
