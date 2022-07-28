@@ -10,15 +10,15 @@ import {
 } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Constants from 'expo-constants'
-
-import { getStoreUser } from '../utils/getFromStorage'
 import { useToast } from 'react-native-styled-toast'
+import { RFPercentage } from 'react-native-responsive-fontsize'
+
+import { getStoreUser, getToken } from '../utils/getFromStorage'
 import AppBar from '../components/appBar'
 import { Colors, toastTheme } from '../config/theme'
 import { RootStackParams } from '../components/routes'
 import Button from '../components/common/Button'
-import { RFPercentage } from 'react-native-responsive-fontsize'
-import { getOrders } from '../services/order'
+import { clearAndSendOrder, getOrders } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
 import { getDataWithTotalCharges } from '../utils/constants'
 
@@ -65,7 +65,6 @@ const Order: FC<Props> = (props: Props) => {
       setLoading(true)
       const user = await getStoreUser()
       const { data } = await getOrders(user._id)
-      console.log('data: ', data)
       const { dataWithCharges, totalCharges } = getDataWithTotalCharges(data)
       setCurrentItems(dataWithCharges)
       setTotalAmount(totalCharges)
@@ -75,8 +74,10 @@ const Order: FC<Props> = (props: Props) => {
     setLoading(false)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     try {
+      const token = await getToken()
+      const { data } = await clearAndSendOrder(currentItems, token)
     } catch (error) {}
   }
 

@@ -7,19 +7,31 @@ export const addOrder = async (body: Order) => await axios.post(orderEndpoint, b
 
 export const getOrders = async (id: string) => await axios.get(`${orderEndpoint}/${id}`)
 
-interface Order {
-  mainUserId: string
-  invitedUsers: [
+export const clearAndSendOrder = async (body: Order[], token: string | null) =>
+  await axios.post(
+    `${orderEndpoint}/email`,
+    { orders: body },
     {
-      userId: string
-      orders: TempOrders[]
+      headers: {
+        'x-auth-token': token
+      }
     }
-  ]
-}
+  )
 
 interface TempOrders {
   itemId: string
   name: string
   price: Number
   quantity: Number
+}
+interface Order {
+  mainUserId: string
+  invitedUsers: [
+    {
+      userId: string
+      userName: string
+      userEmail: string
+      orders: TempOrders[]
+    }
+  ]
 }
