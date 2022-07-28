@@ -19,7 +19,7 @@ export const loginFields: ListProps[] = [
   },
   {
     id: 1,
-    title: 'Passoword',
+    title: 'Password',
     placeHolder: 'Enter strong passoword',
     icon: 'lock',
     name: 'password'
@@ -57,15 +57,15 @@ export const registerFields: ListProps[] = [
   },
   {
     id: 4,
-    title: 'Passoword',
+    title: 'Password',
     placeHolder: 'Enter strong passoword',
     icon: 'lock',
     name: 'password'
   },
   {
     id: 5,
-    title: 'Confirm Passoword',
-    placeHolder: 'Enter confirm passoword',
+    title: 'Confirm Password',
+    placeHolder: 'Enter confirm password',
     icon: 'lock',
     name: 'confirmPassword'
   }

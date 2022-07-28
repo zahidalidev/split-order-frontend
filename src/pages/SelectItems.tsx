@@ -15,6 +15,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import ItemSelectModal from '../components/itemSelectModal'
 import { addOrder } from '../services/order'
 import LoadingModal from '../components/common/LoadingModal'
+import { getRestById } from '../services/restaurant'
 
 interface CurrentItems {
   __v: number
@@ -44,6 +45,11 @@ interface Order {
   ]
 }
 
+interface RestDetails {
+  name: string
+  userId: string
+}
+
 type Props = NativeStackScreenProps<RootStackParams, 'Home'>
 
 const SelectItems: FC<Props> = (props: Props) => {
@@ -52,12 +58,25 @@ const SelectItems: FC<Props> = (props: Props) => {
   const [restId, setRestId] = useState('')
   const [formId, setFormId] = useState('')
   const [loading, setLoading] = useState(false)
+  const [currentRestDetails, setCurrentRestDetails] = useState<RestDetails | {}>({})
   const { toast } = useToast()
 
   useEffect(() => {
-    setRestId(props.route.params.rest_id)
+    const restId = props.route.params.rest_id
+    setRestId(restId)
     setFormId(props.route.params.from_id)
+    handleRetDetails(restId)
   }, [])
+
+  const handleRetDetails = async (restId: string) => {
+    try {
+      const token = await getToken()
+      const { data } = await getRestById(restId, token || '')
+      setCurrentRestDetails(data)
+    } catch (error) {
+      toast({ message: 'Getting Restaurant Error!', ...toastTheme.error })
+    }
+  }
 
   const handleDecrement = (index: number) => {
     const tempItems = [...currentItems]
@@ -100,6 +119,7 @@ const SelectItems: FC<Props> = (props: Props) => {
       }
       await addOrder(body)
       toast({ message: 'Order Submited' })
+      setCurrentItems([])
     } catch (error) {
       toast({ message: 'Error, Order not submited, Try again', ...toastTheme.error })
     }
@@ -143,7 +163,7 @@ const SelectItems: FC<Props> = (props: Props) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={Colors.primary} />
-      <AppBar navigation={props.navigation} title='Name' />
+      <AppBar navigation={props.navigation} title={`Restaurant: ${currentRestDetails.name}`} />
       <LoadingModal show={loading} />
       <ItemSelectModal
         show={showSelectItemModal}

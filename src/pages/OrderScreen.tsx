@@ -6,12 +6,14 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Constants from 'expo-constants'
 import { useToast } from 'react-native-styled-toast'
 import { RFPercentage } from 'react-native-responsive-fontsize'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { getStoreUser, getToken } from '../utils/getFromStorage'
 import AppBar from '../components/appBar'
@@ -29,6 +31,7 @@ interface TempOrders {
   quantity: number
 }
 interface UserOrder {
+  _id: string
   mainUserId: string
   invitedUsers: [
     {
@@ -81,6 +84,12 @@ const Order: FC<Props> = (props: Props) => {
     } catch (error) {}
   }
 
+  const handleRemoveCard = (_id: string) => {
+    let currentItemsTemp = [...currentItems]
+    currentItemsTemp = currentItemsTemp.filter(item => item._id !== _id)
+    setCurrentItems(currentItemsTemp)
+  }
+
   const OrderHeading = () => (
     <View style={[styles.itemContainer, styles.itemHeadingContainer]}>
       <View style={styles.itemWrapper}>
@@ -105,9 +114,16 @@ const Order: FC<Props> = (props: Props) => {
     </View>
   )
 
-  const itemComponent = ({ invitedUsers }: UserOrder) =>
-    invitedUsers.map((user, index) => (
+  const itemComponent = (item: UserOrder) =>
+    item.invitedUsers.map((user, index) => (
       <View key={index.toString()} style={styles.itemContainer}>
+        <TouchableOpacity onPress={() => handleRemoveCard(item._id)} style={styles.removeCard}>
+          <MaterialCommunityIcons
+            name='delete-forever'
+            size={RFPercentage(3)}
+            color={Colors.danger}
+          />
+        </TouchableOpacity>
         <View style={styles.userOrderSummaryHeading}>
           <Text style={styles.orerUserSummary}>Order of {user.userName}</Text>
           <Text style={styles.orerUserSummary}>Total amount ({user.userCharges} PKR)</Text>
@@ -138,7 +154,6 @@ const Order: FC<Props> = (props: Props) => {
           </ScrollView>
         )}
       </View>
-
       <View style={styles.orderBtn}>
         <View style={styles.totalAmountWrapper}>
           <Text style={styles.totalAmount}>Total amount</Text>
@@ -170,14 +185,19 @@ const styles = StyleSheet.create({
   },
 
   itemContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: RFPercentage(0.5)
+    width: '90%',
+    marginLeft: '5%',
+    marginTop: RFPercentage(1),
+    marginBottom: RFPercentage(2),
+    backgroundColor: Colors.white,
+    elevation: 3,
+    borderRadius: 5
   },
 
   itemHeadingContainer: {
     borderBottomColor: Colors.lightGrey,
-    borderBottomWidth: 0.5
+    borderBottomWidth: 0.5,
+    elevation: 0
   },
 
   itemWrapper: {
@@ -223,10 +243,17 @@ const styles = StyleSheet.create({
 
   orderBtn: {
     position: 'absolute',
-    bottom: RFPercentage(4),
+    paddingBottom: RFPercentage(4),
     alignItems: 'center',
+    backgroundColor: Colors.lightGrey2,
     left: 0,
-    right: 0
+    right: 0,
+    bottom: 0,
+    elevation: 20,
+    borderTopRightRadius: RFPercentage(3),
+    borderTopLeftRadius: RFPercentage(3),
+    borderTopWidth: 1,
+    borderTopColor: Colors.grey
   },
 
   orerUserSummary: {
@@ -239,19 +266,23 @@ const styles = StyleSheet.create({
   },
 
   orderContainer: {
-    marginTop: RFPercentage(2)
+    marginTop: RFPercentage(2),
+    marginBottom: RFPercentage(20)
   },
 
   userOrderSummaryHeading: {
     width: '90%',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: RFPercentage(1)
   },
 
   totalAmountWrapper: {
     flexDirection: 'row',
     width: '80%',
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    marginTop: RFPercentage(1)
   },
 
   totalAmount: {
@@ -262,6 +293,13 @@ const styles = StyleSheet.create({
   totalAmountPkr: {
     marginLeft: 5,
     fontWeight: '500'
+  },
+
+  removeCard: {
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    right: RFPercentage(1),
+    top: RFPercentage(1)
   }
 })
 

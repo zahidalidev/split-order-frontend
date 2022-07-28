@@ -35,6 +35,13 @@ export const getRestaurantItems = async (restId: string, token: string) =>
     }
   })
 
+export const getRestById = async (id: string, token: string) =>
+  await axios.get(`${restEndpoint}/${id}`, {
+    headers: {
+      'x-auth-token': token
+    }
+  })
+
 interface RestaurantItem {
   name: string
   price: number

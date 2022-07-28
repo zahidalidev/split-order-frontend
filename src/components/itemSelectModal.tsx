@@ -41,7 +41,6 @@ const ItemSelectModal: FC<Props> = ({ show, restId, setShowItemModal, selectItem
     try {
       showLoading(true)
       const token = await getToken()
-      console.log('restId modal: ', restId)
       const { data } = await getRestaurantItems(restId, token || '')
       setItems(data)
     } catch (error) {
