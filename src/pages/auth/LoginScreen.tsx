@@ -39,9 +39,9 @@ const Login: FC<Props> = ({ navigation }: Props) => {
   const { toast } = useToast()
 
   const loginHandle = async (values: valuesOb) => {
-    const pushToken = await getPushNotificationsToken()
     try {
       setLoading(true)
+      const pushToken = await getPushNotificationsToken()
       const tempValues = { ...values, pushToken }
       const { data } = await loginUser(tempValues)
       AsyncStorage.setItem(Token, JSON.stringify(data))
@@ -50,9 +50,9 @@ const Login: FC<Props> = ({ navigation }: Props) => {
         message: 'Login Successful!'
       })
       navigation.navigate('Home', { name: '' })
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        message: 'Login Error!',
+        message: error,
         ...toastTheme.error
       })
     }
