@@ -8,19 +8,22 @@ RUN apk --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/test
 
 WORKDIR /src
 
-COPY package*.json .
-COPY ./split-order-frontend/app.json .
-COPY ./split-order-frontend/tsconfig.json .
+COPY package.json .
+COPY package-lock.json .
+COPY app.json .
+COPY tsconfig.json .
+# COPY --chown=node:node .env .
 
 RUN npm install
 RUN npm install -g expo-cli
 
-COPY ./split-order-frontend/ .
+COPY . .
 
 CMD adb connect $ADB_IP && \
         expo start
 
 # docker run -e ADB_IP=100.72.254.131 -e REACT_NATIVE_PACKAGER_HOSTNAME=10.10.11.83 -p 19000:19000 -p 19001:19001 zahidali5/temp:test
 
+#in .env file
 # ADB_IP="IP of mobile device"
 # REACT_NATIVE_PACKAGER_HOSTNAME="10.10.11.83"
