@@ -8,7 +8,8 @@ RUN apk --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/test
 
 WORKDIR /src
 
-COPY package*.json .
+COPY package.json .
+COPY package-lock.json .
 COPY app.json .
 COPY tsconfig.json .
 
