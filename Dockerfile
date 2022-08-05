@@ -9,13 +9,13 @@ RUN apk --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/test
 WORKDIR /src
 
 COPY package*.json .
-COPY app.json .
-COPY tsconfig.json .
+COPY ./split-order-frontend/app.json .
+COPY ./split-order-frontend/tsconfig.json .
 
 RUN npm install
 RUN npm install -g expo-cli
 
-COPY . .
+COPY ./split-order-frontend/ .
 
 CMD adb connect $ADB_IP && \
         expo start
