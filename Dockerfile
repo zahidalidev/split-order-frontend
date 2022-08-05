@@ -23,5 +23,6 @@ CMD adb connect $ADB_IP && \
 
 # docker run -e ADB_IP=100.72.254.131 -e REACT_NATIVE_PACKAGER_HOSTNAME=10.10.11.83 -p 19000:19000 -p 19001:19001 zahidali5/temp:test
 
+#in .env file
 # ADB_IP="IP of mobile device"
 # REACT_NATIVE_PACKAGER_HOSTNAME="10.10.11.83"
