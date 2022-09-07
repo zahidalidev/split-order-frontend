@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "717159724208",
+    "project_id": "split-18add",
+    "storage_bucket": "split-18add.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717159724208:android:b5eedced795b037fdff775",
+        "android_client_info": {
+          "package_name": "com.zahidali.splitorder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "717159724208-5hrjob0p9s089g6f0e451l1o18rqeffq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zahidali.splitorder",
+            "certificate_hash": "6c33773c5847faca39fdf6c9626bf74cf47f97d4"
+          }
+        },
+        {
+          "client_id": "717159724208-go103oa7sk9m3ife49huocurnlm545tl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA72kdwfi_N3A_m-vo8Toytn_ORhuqJHiA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "717159724208-go103oa7sk9m3ife49huocurnlm545tl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
